@@ -1,0 +1,577 @@
+[
+  {
+    "slug": "barbarian",
+    "name": "Bárbaro",
+    "description": "Un guerrero feroz que canaliza su furia primitiva en combate.",
+    "hit_die": 12,
+    "primary_abilities": ["str"],
+    "saving_throws": ["str", "con"],
+    "skill_choices": {"count": 2, "options": ["animal_handling", "athletics", "intimidation", "nature", "perception", "survival"]},
+    "proficiencies": ["Armadura ligera", "Armadura media", "Escudos", "Armas sencillas", "Armas marciales"],
+    "spellcasting": null,
+    "recommended_abilities": ["str", "con", "dex", "wis", "cha", "int"],
+    "starting_ac": {"base": 10, "dex": "full", "extra": "con", "shield": false},
+    "starting_attacks": [
+      {"name": "Gran hacha", "ability": "str", "damage_die": "1d12", "damage_type": "cortante"},
+      {"name": "Jabalina", "ability": "str", "damage_die": "1d6", "damage_type": "perforante", "notes": "Arrojadiza (30/120)"}
+    ],
+    "starting_equipment": ["Gran hacha", "2 hachas de mano", "Paquete de explorador", "4 jabalinas"],
+    "subclass_label": "Senda primaria",
+    "subclass_level": 3,
+    "features": {
+      "1": [
+        {"name": "Furia", "description": "Como acción adicional entras en furia: ventaja en pruebas y salvaciones de Fuerza, bonificador al daño cuerpo a cuerpo con Fuerza y resistencia al daño contundente, cortante y perforante. 2 usos por descanso largo."},
+        {"name": "Defensa sin armadura", "description": "Sin armadura, tu CA es 10 + mod. de Destreza + mod. de Constitución. Puedes usar escudo."}
+      ],
+      "2": [
+        {"name": "Ataque temerario", "description": "Puedes atacar con ventaja usando Fuerza este turno, pero los ataques contra ti tienen ventaja hasta tu siguiente turno."},
+        {"name": "Sentido del peligro", "description": "Ventaja en salvaciones de Destreza contra efectos que puedas ver."}
+      ],
+      "3": [{"name": "Senda primaria", "description": "Elige una senda (p. ej. Senda del berserker) que otorga rasgos a los niveles 3, 6, 10 y 14."}],
+      "4": ["ASI"],
+      "5": [
+        {"name": "Ataque adicional", "description": "Atacas dos veces cuando realizas la acción de Atacar."},
+        {"name": "Movimiento rápido", "description": "Tu velocidad aumenta 10 pies si no llevas armadura pesada."}
+      ],
+      "6": [{"name": "Rasgo de senda", "description": "Obtienes un rasgo de tu senda primaria."}],
+      "7": [{"name": "Instinto salvaje", "description": "Ventaja en tiradas de iniciativa; si estás sorprendido puedes actuar si entras en furia."}],
+      "8": ["ASI"],
+      "9": [{"name": "Crítico brutal", "description": "Tiras un dado de daño de arma adicional en los críticos cuerpo a cuerpo (2 a nivel 13, 3 a nivel 17)."}],
+      "10": [{"name": "Rasgo de senda", "description": "Obtienes un rasgo de tu senda primaria."}],
+      "11": [{"name": "Furia implacable", "description": "Si caes a 0 PG en furia, salvación de Con CD 10 (+5 por uso) para quedar a 1 PG."}],
+      "12": ["ASI"],
+      "14": [{"name": "Rasgo de senda", "description": "Obtienes un rasgo de tu senda primaria."}],
+      "15": [{"name": "Furia persistente", "description": "Tu furia solo termina antes de tiempo si caes inconsciente o decides terminarla."}],
+      "16": ["ASI"],
+      "18": [{"name": "Fuerza indomable", "description": "Si el total de una prueba de Fuerza es menor que tu puntuación de Fuerza, usas la puntuación."}],
+      "19": ["ASI"],
+      "20": [{"name": "Campeón primario", "description": "Tu Fuerza y Constitución aumentan en 4 (máximo 24)."}]
+    }
+  },
+  {
+    "slug": "bard",
+    "name": "Bardo",
+    "description": "Un mago inspirador cuya música y palabras tejen la magia.",
+    "hit_die": 8,
+    "primary_abilities": ["cha"],
+    "saving_throws": ["dex", "cha"],
+    "skill_choices": {"count": 3, "options": "any"},
+    "proficiencies": ["Armadura ligera", "Armas sencillas", "Ballesta de mano", "Espada larga", "Estoque", "Espada corta", "Tres instrumentos musicales"],
+    "spellcasting": {"ability": "cha", "type": "full"},
+    "recommended_abilities": ["cha", "dex", "con", "wis", "int", "str"],
+    "starting_ac": {"base": 11, "dex": "full", "extra": null, "shield": false},
+    "starting_attacks": [
+      {"name": "Estoque", "ability": "finesse", "damage_die": "1d8", "damage_type": "perforante"},
+      {"name": "Daga", "ability": "finesse", "damage_die": "1d4", "damage_type": "perforante", "notes": "Arrojadiza (20/60)"}
+    ],
+    "starting_equipment": ["Estoque", "Paquete de diplomático", "Laúd", "Armadura de cuero", "Daga"],
+    "subclass_label": "Colegio bárdico",
+    "subclass_level": 3,
+    "features": {
+      "1": [
+        {"name": "Lanzamiento de conjuros", "description": "Lanzas conjuros de bardo usando Carisma. Puedes usar un instrumento musical como canalizador."},
+        {"name": "Inspiración bárdica (d6)", "description": "Como acción adicional, otorgas a una criatura un dado de inspiración que puede sumar a una prueba, ataque o salvación. Usos = mod. de Carisma por descanso largo."}
+      ],
+      "2": [
+        {"name": "Aprendiz de mucho", "description": "Sumas la mitad de tu competencia a pruebas de característica en las que no eres competente."},
+        {"name": "Canción de descanso (d6)", "description": "Durante un descanso corto, los aliados que gasten dados de golpe recuperan 1d6 PG extra."}
+      ],
+      "3": [
+        {"name": "Colegio bárdico", "description": "Elige un colegio (p. ej. Colegio del saber) que otorga rasgos a los niveles 3, 6 y 14."},
+        {"name": "Pericia", "description": "Elige dos habilidades competentes: tu bonificador de competencia se duplica en ellas."}
+      ],
+      "4": ["ASI"],
+      "5": [
+        {"name": "Inspiración bárdica (d8)", "description": "Tu dado de inspiración pasa a ser d8."},
+        {"name": "Fuente de inspiración", "description": "Recuperas tus usos de Inspiración bárdica tras un descanso corto o largo."}
+      ],
+      "6": [
+        {"name": "Contraencantamiento", "description": "Como acción, tú y aliados a 30 pies tenéis ventaja contra ser asustados o hechizados."},
+        {"name": "Rasgo de colegio", "description": "Obtienes un rasgo de tu colegio bárdico."}
+      ],
+      "8": ["ASI"],
+      "9": [{"name": "Canción de descanso (d8)", "description": "El dado extra de curación pasa a d8."}],
+      "10": [
+        {"name": "Inspiración bárdica (d10)", "description": "Tu dado de inspiración pasa a ser d10."},
+        {"name": "Pericia", "description": "Elige dos habilidades más para duplicar tu competencia."},
+        {"name": "Secretos mágicos", "description": "Aprendes dos conjuros de cualquier clase; cuentan como conjuros de bardo."}
+      ],
+      "12": ["ASI"],
+      "13": [{"name": "Canción de descanso (d10)", "description": "El dado extra de curación pasa a d10."}],
+      "14": [
+        {"name": "Secretos mágicos", "description": "Aprendes dos conjuros más de cualquier clase."},
+        {"name": "Rasgo de colegio", "description": "Obtienes un rasgo de tu colegio bárdico."}
+      ],
+      "15": [{"name": "Inspiración bárdica (d12)", "description": "Tu dado de inspiración pasa a ser d12."}],
+      "16": ["ASI"],
+      "17": [{"name": "Canción de descanso (d12)", "description": "El dado extra de curación pasa a d12."}],
+      "18": [{"name": "Secretos mágicos", "description": "Aprendes dos conjuros más de cualquier clase."}],
+      "19": ["ASI"],
+      "20": [{"name": "Inspiración superior", "description": "Si tiras iniciativa sin usos de Inspiración bárdica, recuperas uno."}]
+    }
+  },
+  {
+    "slug": "cleric",
+    "name": "Clérigo",
+    "description": "Un campeón sacerdotal que blande magia divina al servicio de un poder superior.",
+    "hit_die": 8,
+    "primary_abilities": ["wis"],
+    "saving_throws": ["wis", "cha"],
+    "skill_choices": {"count": 2, "options": ["history", "insight", "medicine", "persuasion", "religion"]},
+    "proficiencies": ["Armadura ligera", "Armadura media", "Escudos", "Armas sencillas"],
+    "spellcasting": {"ability": "wis", "type": "full"},
+    "recommended_abilities": ["wis", "con", "str", "cha", "dex", "int"],
+    "starting_ac": {"base": 14, "dex": "max2", "extra": null, "shield": true},
+    "starting_attacks": [
+      {"name": "Maza", "ability": "str", "damage_die": "1d6", "damage_type": "contundente"},
+      {"name": "Ballesta ligera", "ability": "dex", "damage_die": "1d8", "damage_type": "perforante", "notes": "Alcance (80/320)"}
+    ],
+    "starting_equipment": ["Maza", "Cota de escamas", "Ballesta ligera y 20 virotes", "Paquete de sacerdote", "Escudo", "Símbolo sagrado"],
+    "subclass_label": "Dominio divino",
+    "subclass_level": 1,
+    "features": {
+      "1": [
+        {"name": "Lanzamiento de conjuros", "description": "Preparas y lanzas conjuros de clérigo usando Sabiduría. Usas un símbolo sagrado como canalizador."},
+        {"name": "Dominio divino", "description": "Elige un dominio (p. ej. Dominio de la vida) que otorga conjuros y rasgos a los niveles 1, 2, 6, 8 y 17."}
+      ],
+      "2": [
+        {"name": "Canalizar divinidad (1/descanso)", "description": "Canalizas energía divina: Expulsar muertos vivientes y el efecto de tu dominio. Se recupera tras un descanso corto o largo."},
+        {"name": "Rasgo de dominio", "description": "Obtienes una opción de Canalizar divinidad de tu dominio."}
+      ],
+      "4": ["ASI"],
+      "5": [{"name": "Destruir muertos vivientes (VD 1/2)", "description": "Los muertos vivientes de VD 1/2 o menos que fallen contra tu Expulsar son destruidos."}],
+      "6": [
+        {"name": "Canalizar divinidad (2/descanso)", "description": "Puedes usar Canalizar divinidad dos veces entre descansos."},
+        {"name": "Rasgo de dominio", "description": "Obtienes un rasgo de tu dominio divino."}
+      ],
+      "8": [
+        "ASI",
+        {"name": "Destruir muertos vivientes (VD 1)", "description": "El umbral de destrucción sube a VD 1."},
+        {"name": "Rasgo de dominio", "description": "Obtienes un rasgo de tu dominio divino (Golpe divino o Lanzamiento potente)."}
+      ],
+      "10": [{"name": "Intervención divina", "description": "Pides ayuda a tu deidad: si sacas en d100 un número igual o menor que tu nivel de clérigo, interviene."}],
+      "11": [{"name": "Destruir muertos vivientes (VD 2)", "description": "El umbral de destrucción sube a VD 2."}],
+      "12": ["ASI"],
+      "14": [{"name": "Destruir muertos vivientes (VD 3)", "description": "El umbral de destrucción sube a VD 3."}],
+      "16": ["ASI"],
+      "17": [
+        {"name": "Destruir muertos vivientes (VD 4)", "description": "El umbral de destrucción sube a VD 4."},
+        {"name": "Rasgo de dominio", "description": "Obtienes el rasgo culminante de tu dominio divino."}
+      ],
+      "18": [{"name": "Canalizar divinidad (3/descanso)", "description": "Puedes usar Canalizar divinidad tres veces entre descansos."}],
+      "19": ["ASI"],
+      "20": [{"name": "Mejora de intervención divina", "description": "Tu Intervención divina tiene éxito automáticamente."}]
+    }
+  },
+  {
+    "slug": "druid",
+    "name": "Druida",
+    "description": "Un sacerdote de la Antigua Fe que domina los poderes de la naturaleza y adopta formas animales.",
+    "hit_die": 8,
+    "primary_abilities": ["wis"],
+    "saving_throws": ["int", "wis"],
+    "skill_choices": {"count": 2, "options": ["arcana", "animal_handling", "insight", "medicine", "nature", "perception", "religion", "survival"]},
+    "proficiencies": ["Armadura ligera y media (no metálica)", "Escudos (no metálicos)", "Garrote", "Daga", "Dardo", "Jabalina", "Maza", "Bastón", "Cimitarra", "Hoz", "Honda", "Lanza", "Útiles de herborista"],
+    "spellcasting": {"ability": "wis", "type": "full"},
+    "recommended_abilities": ["wis", "con", "dex", "int", "cha", "str"],
+    "starting_ac": {"base": 11, "dex": "full", "extra": null, "shield": true},
+    "starting_attacks": [
+      {"name": "Cimitarra", "ability": "finesse", "damage_die": "1d6", "damage_type": "cortante"}
+    ],
+    "starting_equipment": ["Escudo de madera", "Cimitarra", "Armadura de cuero", "Paquete de explorador", "Canalizador druídico"],
+    "subclass_label": "Círculo druídico",
+    "subclass_level": 2,
+    "features": {
+      "1": [
+        {"name": "Druídico", "description": "Conoces el idioma secreto de los druidas."},
+        {"name": "Lanzamiento de conjuros", "description": "Preparas y lanzas conjuros de druida usando Sabiduría."}
+      ],
+      "2": [
+        {"name": "Forma salvaje", "description": "Como acción, adoptas la forma de una bestia que hayas visto (VD máx. 1/4, sin volar ni nadar). 2 usos por descanso corto."},
+        {"name": "Círculo druídico", "description": "Elige un círculo (p. ej. Círculo de la tierra) que otorga rasgos a los niveles 2, 6, 10 y 14."}
+      ],
+      "4": ["ASI", {"name": "Mejora de forma salvaje", "description": "VD máximo 1/2, puedes nadar."}],
+      "6": [{"name": "Rasgo de círculo", "description": "Obtienes un rasgo de tu círculo druídico."}],
+      "8": ["ASI", {"name": "Mejora de forma salvaje", "description": "VD máximo 1, puedes volar."}],
+      "10": [{"name": "Rasgo de círculo", "description": "Obtienes un rasgo de tu círculo druídico."}],
+      "12": ["ASI"],
+      "14": [{"name": "Rasgo de círculo", "description": "Obtienes un rasgo de tu círculo druídico."}],
+      "16": ["ASI"],
+      "18": [
+        {"name": "Cuerpo atemporal", "description": "Envejeces 1 año por cada 10 que pasan."},
+        {"name": "Conjuros de bestia", "description": "Puedes lanzar muchos conjuros estando en forma salvaje."}
+      ],
+      "19": ["ASI"],
+      "20": [{"name": "Archidruida", "description": "Usos ilimitados de Forma salvaje e ignoras componentes verbales, somáticos y materiales sin coste."}]
+    }
+  },
+  {
+    "slug": "fighter",
+    "name": "Guerrero",
+    "description": "Un maestro del combate marcial, experto con gran variedad de armas y armaduras.",
+    "hit_die": 10,
+    "primary_abilities": ["str", "dex"],
+    "saving_throws": ["str", "con"],
+    "skill_choices": {"count": 2, "options": ["acrobatics", "animal_handling", "athletics", "history", "insight", "intimidation", "perception", "survival"]},
+    "proficiencies": ["Todas las armaduras", "Escudos", "Armas sencillas", "Armas marciales"],
+    "spellcasting": null,
+    "recommended_abilities": ["str", "con", "dex", "wis", "cha", "int"],
+    "starting_ac": {"base": 16, "dex": "none", "extra": null, "shield": false},
+    "starting_attacks": [
+      {"name": "Espada larga", "ability": "str", "damage_die": "1d8", "damage_type": "cortante", "notes": "Versátil (1d10)"},
+      {"name": "Ballesta ligera", "ability": "dex", "damage_die": "1d8", "damage_type": "perforante", "notes": "Alcance (80/320)"}
+    ],
+    "starting_equipment": ["Cota de mallas", "Espada larga", "Escudo", "Ballesta ligera y 20 virotes", "Paquete de explorador de mazmorras"],
+    "subclass_label": "Arquetipo marcial",
+    "subclass_level": 3,
+    "features": {
+      "1": [
+        {"name": "Estilo de combate", "description": "Adoptas un estilo: Arquería, Defensa, Duelo, Combate con armas grandes, Protección o Combate con dos armas."},
+        {"name": "Tomar aliento", "description": "Como acción adicional recuperas 1d10 + nivel de guerrero PG. Se recupera tras un descanso corto o largo."}
+      ],
+      "2": [{"name": "Acción súbita", "description": "Una vez por descanso corto, realizas una acción adicional en tu turno."}],
+      "3": [{"name": "Arquetipo marcial", "description": "Elige un arquetipo (p. ej. Campeón) que otorga rasgos a los niveles 3, 7, 10, 15 y 18."}],
+      "4": ["ASI"],
+      "5": [{"name": "Ataque adicional", "description": "Atacas dos veces cuando realizas la acción de Atacar."}],
+      "6": ["ASI"],
+      "7": [{"name": "Rasgo de arquetipo", "description": "Obtienes un rasgo de tu arquetipo marcial."}],
+      "8": ["ASI"],
+      "9": [{"name": "Indomable", "description": "Puedes repetir una salvación fallida. 1 uso por descanso largo (2 a nivel 13, 3 a nivel 17)."}],
+      "10": [{"name": "Rasgo de arquetipo", "description": "Obtienes un rasgo de tu arquetipo marcial."}],
+      "11": [{"name": "Ataque adicional (2)", "description": "Atacas tres veces cuando realizas la acción de Atacar."}],
+      "12": ["ASI"],
+      "13": [{"name": "Indomable (2 usos)", "description": "Puedes usar Indomable dos veces entre descansos largos."}],
+      "14": ["ASI"],
+      "15": [{"name": "Rasgo de arquetipo", "description": "Obtienes un rasgo de tu arquetipo marcial."}],
+      "16": ["ASI"],
+      "17": [
+        {"name": "Acción súbita (2 usos)", "description": "Puedes usar Acción súbita dos veces entre descansos (una por turno)."},
+        {"name": "Indomable (3 usos)", "description": "Puedes usar Indomable tres veces entre descansos largos."}
+      ],
+      "18": [{"name": "Rasgo de arquetipo", "description": "Obtienes un rasgo de tu arquetipo marcial."}],
+      "19": ["ASI"],
+      "20": [{"name": "Ataque adicional (3)", "description": "Atacas cuatro veces cuando realizas la acción de Atacar."}]
+    }
+  },
+  {
+    "slug": "monk",
+    "name": "Monje",
+    "description": "Un maestro de las artes marciales que canaliza el ki de su cuerpo.",
+    "hit_die": 8,
+    "primary_abilities": ["dex", "wis"],
+    "saving_throws": ["str", "dex"],
+    "skill_choices": {"count": 2, "options": ["acrobatics", "athletics", "history", "insight", "religion", "stealth"]},
+    "proficiencies": ["Armas sencillas", "Espada corta", "Una herramienta de artesano o instrumento"],
+    "spellcasting": null,
+    "recommended_abilities": ["dex", "wis", "con", "str", "int", "cha"],
+    "starting_ac": {"base": 10, "dex": "full", "extra": "wis", "shield": false},
+    "starting_attacks": [
+      {"name": "Espada corta", "ability": "finesse", "damage_die": "1d6", "damage_type": "perforante"},
+      {"name": "Ataque sin armas", "ability": "finesse", "damage_die": "1d4", "damage_type": "contundente", "notes": "Artes marciales"}
+    ],
+    "starting_equipment": ["Espada corta", "Paquete de explorador de mazmorras", "10 dardos"],
+    "subclass_label": "Tradición monástica",
+    "subclass_level": 3,
+    "features": {
+      "1": [
+        {"name": "Defensa sin armadura", "description": "Sin armadura ni escudo, tu CA es 10 + mod. de Destreza + mod. de Sabiduría."},
+        {"name": "Artes marciales", "description": "Usas Destreza con armas de monje y ataques sin armas (d4, aumenta con el nivel); ataque sin armas como acción adicional."}
+      ],
+      "2": [
+        {"name": "Ki", "description": "Puntos de ki = nivel de monje: Ráfaga de golpes, Defensa paciente y Paso del viento. Se recuperan tras un descanso corto."},
+        {"name": "Movimiento sin armadura", "description": "Tu velocidad aumenta 10 pies sin armadura ni escudo (aumenta con el nivel)."}
+      ],
+      "3": [
+        {"name": "Tradición monástica", "description": "Elige una tradición (p. ej. Camino de la mano abierta) con rasgos a niveles 3, 6, 11 y 17."},
+        {"name": "Desviar proyectiles", "description": "Como reacción reduces el daño de un proyectil en 1d10 + mod. Des + nivel; si llega a 0 puedes atraparlo y devolverlo."}
+      ],
+      "4": ["ASI", {"name": "Caída lenta", "description": "Como reacción reduces el daño por caída en 5 × nivel de monje."}],
+      "5": [
+        {"name": "Ataque adicional", "description": "Atacas dos veces cuando realizas la acción de Atacar."},
+        {"name": "Golpe aturdidor", "description": "Gasta 1 ki al impactar: el objetivo hace salvación de Con o queda aturdido hasta el final de tu siguiente turno."}
+      ],
+      "6": [
+        {"name": "Golpes potenciados por ki", "description": "Tus ataques sin armas cuentan como mágicos."},
+        {"name": "Rasgo de tradición", "description": "Obtienes un rasgo de tu tradición monástica."}
+      ],
+      "7": [
+        {"name": "Evasión", "description": "En salvaciones de Destreza para mitad de daño, no recibes daño si tienes éxito y la mitad si fallas."},
+        {"name": "Mente tranquila", "description": "Como acción terminas un efecto que te tenga hechizado o asustado."}
+      ],
+      "8": ["ASI"],
+      "9": [{"name": "Mejora de movimiento sin armadura", "description": "Puedes moverte por superficies verticales y por líquidos durante tu turno."}],
+      "10": [{"name": "Pureza corporal", "description": "Eres inmune a enfermedades y venenos."}],
+      "11": [{"name": "Rasgo de tradición", "description": "Obtienes un rasgo de tu tradición monástica."}],
+      "12": ["ASI"],
+      "13": [{"name": "Lengua del sol y la luna", "description": "Entiendes todos los idiomas hablados y cualquiera que hable un idioma te entiende."}],
+      "14": [{"name": "Alma de diamante", "description": "Competencia en todas las salvaciones; gasta 1 ki para repetir una fallida."}],
+      "15": [{"name": "Cuerpo atemporal", "description": "No sufres los achaques de la edad y no necesitas comida ni agua."}],
+      "16": ["ASI"],
+      "17": [{"name": "Rasgo de tradición", "description": "Obtienes un rasgo de tu tradición monástica."}],
+      "18": [{"name": "Cuerpo vacío", "description": "Gasta 4 ki para volverte invisible un minuto con resistencia a todo excepto fuerza."}],
+      "19": ["ASI"],
+      "20": [{"name": "Perfección del ser", "description": "Si tiras iniciativa sin ki, recuperas 4 puntos."}]
+    }
+  },
+  {
+    "slug": "paladin",
+    "name": "Paladín",
+    "description": "Un guerrero sagrado ligado a un juramento.",
+    "hit_die": 10,
+    "primary_abilities": ["str", "cha"],
+    "saving_throws": ["wis", "cha"],
+    "skill_choices": {"count": 2, "options": ["athletics", "insight", "intimidation", "medicine", "persuasion", "religion"]},
+    "proficiencies": ["Todas las armaduras", "Escudos", "Armas sencillas", "Armas marciales"],
+    "spellcasting": {"ability": "cha", "type": "half"},
+    "recommended_abilities": ["str", "cha", "con", "wis", "dex", "int"],
+    "starting_ac": {"base": 16, "dex": "none", "extra": null, "shield": false},
+    "starting_attacks": [
+      {"name": "Espada larga", "ability": "str", "damage_die": "1d8", "damage_type": "cortante", "notes": "Versátil (1d10)"},
+      {"name": "Jabalina", "ability": "str", "damage_die": "1d6", "damage_type": "perforante", "notes": "Arrojadiza (30/120)"}
+    ],
+    "starting_equipment": ["Cota de mallas", "Espada larga", "Escudo", "5 jabalinas", "Paquete de sacerdote", "Símbolo sagrado"],
+    "subclass_label": "Juramento sagrado",
+    "subclass_level": 3,
+    "features": {
+      "1": [
+        {"name": "Sentido divino", "description": "Como acción detectas celestiales, infernales y muertos vivientes a 60 pies. Usos = 1 + mod. de Carisma por descanso largo."},
+        {"name": "Imposición de manos", "description": "Reserva de curación de 5 × nivel de paladín PG por descanso largo; 5 puntos curan una enfermedad o veneno."}
+      ],
+      "2": [
+        {"name": "Estilo de combate", "description": "Adoptas un estilo: Defensa, Duelo, Combate con armas grandes o Protección."},
+        {"name": "Lanzamiento de conjuros", "description": "Preparas y lanzas conjuros de paladín usando Carisma."},
+        {"name": "Castigo divino", "description": "Al impactar cuerpo a cuerpo, gasta un espacio de conjuro para infligir 2d8 de daño radiante extra (+1d8 por nivel de espacio)."}
+      ],
+      "3": [
+        {"name": "Salud divina", "description": "Eres inmune a las enfermedades."},
+        {"name": "Juramento sagrado", "description": "Presta un juramento (p. ej. Juramento de entrega) con rasgos a niveles 3, 7, 15 y 20."}
+      ],
+      "4": ["ASI"],
+      "5": [{"name": "Ataque adicional", "description": "Atacas dos veces cuando realizas la acción de Atacar."}],
+      "6": [{"name": "Aura de protección", "description": "Tú y aliados a 10 pies sumáis tu mod. de Carisma a las salvaciones."}],
+      "7": [{"name": "Rasgo de juramento", "description": "Obtienes el aura de tu juramento sagrado."}],
+      "8": ["ASI"],
+      "10": [{"name": "Aura de valor", "description": "Tú y aliados a 10 pies no podéis ser asustados mientras estés consciente."}],
+      "11": [{"name": "Castigo divino mejorado", "description": "Tus ataques cuerpo a cuerpo infligen 1d8 de daño radiante extra."}],
+      "12": ["ASI"],
+      "14": [{"name": "Toque purificador", "description": "Como acción terminas un conjuro sobre ti o una criatura voluntaria. Usos = mod. de Carisma."}],
+      "15": [{"name": "Rasgo de juramento", "description": "Obtienes un rasgo de tu juramento sagrado."}],
+      "16": ["ASI"],
+      "18": [{"name": "Mejoras de aura", "description": "El alcance de tus auras aumenta a 30 pies."}],
+      "19": ["ASI"],
+      "20": [{"name": "Rasgo de juramento", "description": "Obtienes la forma culminante de tu juramento sagrado."}]
+    }
+  },
+  {
+    "slug": "ranger",
+    "name": "Explorador",
+    "description": "Un guerrero que combate las amenazas en los confines de la civilización.",
+    "hit_die": 10,
+    "primary_abilities": ["dex", "wis"],
+    "saving_throws": ["str", "dex"],
+    "skill_choices": {"count": 3, "options": ["animal_handling", "athletics", "insight", "investigation", "nature", "perception", "stealth", "survival"]},
+    "proficiencies": ["Armadura ligera", "Armadura media", "Escudos", "Armas sencillas", "Armas marciales"],
+    "spellcasting": {"ability": "wis", "type": "half"},
+    "recommended_abilities": ["dex", "wis", "con", "str", "int", "cha"],
+    "starting_ac": {"base": 14, "dex": "max2", "extra": null, "shield": false},
+    "starting_attacks": [
+      {"name": "Arco largo", "ability": "dex", "damage_die": "1d8", "damage_type": "perforante", "notes": "Alcance (150/600)"},
+      {"name": "Espada corta", "ability": "finesse", "damage_die": "1d6", "damage_type": "perforante"}
+    ],
+    "starting_equipment": ["Cota de escamas", "2 espadas cortas", "Paquete de explorador", "Arco largo y carcaj con 20 flechas"],
+    "subclass_label": "Arquetipo de explorador",
+    "subclass_level": 3,
+    "features": {
+      "1": [
+        {"name": "Enemigo predilecto", "description": "Ventaja en pruebas de Supervivencia para rastrear a tu tipo de enemigo predilecto y de Inteligencia para recordar información sobre ellos."},
+        {"name": "Explorador nato", "description": "En tu terreno predilecto viajas sin perder el rumbo, duplicas tu competencia en pruebas de Int y Sab y no te ralentiza el terreno difícil."}
+      ],
+      "2": [
+        {"name": "Estilo de combate", "description": "Adoptas un estilo: Arquería, Defensa, Duelo o Combate con dos armas."},
+        {"name": "Lanzamiento de conjuros", "description": "Conoces y lanzas conjuros de explorador usando Sabiduría."}
+      ],
+      "3": [
+        {"name": "Arquetipo de explorador", "description": "Elige un arquetipo (p. ej. Cazador) con rasgos a niveles 3, 7, 11 y 15."},
+        {"name": "Consciencia primigenia", "description": "Gasta un espacio de conjuro para percibir ciertos tipos de criaturas en un radio de 1 milla."}
+      ],
+      "4": ["ASI"],
+      "5": [{"name": "Ataque adicional", "description": "Atacas dos veces cuando realizas la acción de Atacar."}],
+      "6": [{"name": "Mejora de enemigo predilecto y explorador nato", "description": "Eliges un enemigo predilecto y un terreno predilecto adicionales."}],
+      "7": [{"name": "Rasgo de arquetipo", "description": "Obtienes un rasgo de tu arquetipo de explorador."}],
+      "8": ["ASI", {"name": "Zancada por la tierra", "description": "El terreno difícil no mágico no te cuesta movimiento extra y tienes ventaja contra plantas mágicas."}],
+      "10": [{"name": "Ocultarse a plena vista", "description": "Pasas 1 minuto camuflándote: +10 a Sigilo mientras no te muevas."}],
+      "11": [{"name": "Rasgo de arquetipo", "description": "Obtienes un rasgo de tu arquetipo de explorador."}],
+      "12": ["ASI"],
+      "14": [{"name": "Desvanecerse", "description": "Puedes Esconderte como acción adicional y no puedes ser rastreado por medios no mágicos."}],
+      "15": [{"name": "Rasgo de arquetipo", "description": "Obtienes un rasgo de tu arquetipo de explorador."}],
+      "16": ["ASI"],
+      "18": [{"name": "Sentidos salvajes", "description": "Atacar a criaturas invisibles no te impone desventaja y percibes las invisibles a 30 pies."}],
+      "19": ["ASI"],
+      "20": [{"name": "Asesino de enemigos", "description": "Una vez por turno sumas tu mod. de Sabiduría al ataque o daño contra un enemigo predilecto."}]
+    }
+  },
+  {
+    "slug": "rogue",
+    "name": "Pícaro",
+    "description": "Un canalla que usa el sigilo y la astucia para superar obstáculos y enemigos.",
+    "hit_die": 8,
+    "primary_abilities": ["dex"],
+    "saving_throws": ["dex", "int"],
+    "skill_choices": {"count": 4, "options": ["acrobatics", "athletics", "deception", "insight", "intimidation", "investigation", "perception", "performance", "persuasion", "sleight_of_hand", "stealth"]},
+    "proficiencies": ["Armadura ligera", "Armas sencillas", "Ballesta de mano", "Espada larga", "Estoque", "Espada corta", "Herramientas de ladrón"],
+    "spellcasting": null,
+    "recommended_abilities": ["dex", "con", "int", "wis", "cha", "str"],
+    "starting_ac": {"base": 11, "dex": "full", "extra": null, "shield": false},
+    "starting_attacks": [
+      {"name": "Estoque", "ability": "finesse", "damage_die": "1d8", "damage_type": "perforante"},
+      {"name": "Arco corto", "ability": "dex", "damage_die": "1d6", "damage_type": "perforante", "notes": "Alcance (80/320)"},
+      {"name": "Daga", "ability": "finesse", "damage_die": "1d4", "damage_type": "perforante", "notes": "Arrojadiza (20/60)"}
+    ],
+    "starting_equipment": ["Estoque", "Arco corto y carcaj con 20 flechas", "Paquete de ladrón", "Armadura de cuero", "2 dagas", "Herramientas de ladrón"],
+    "subclass_label": "Arquetipo de pícaro",
+    "subclass_level": 3,
+    "features": {
+      "1": [
+        {"name": "Pericia", "description": "Elige dos habilidades competentes (o una y herramientas de ladrón): tu competencia se duplica en ellas."},
+        {"name": "Ataque furtivo (1d6)", "description": "Una vez por turno infliges daño extra al impactar con ventaja o con un aliado adyacente al objetivo, usando arma sutil o a distancia. Aumenta 1d6 cada dos niveles (3, 5, 7...)."},
+        {"name": "Jerga de ladrones", "description": "Conoces la mezcla secreta de dialecto, jerga y códigos de los ladrones."}
+      ],
+      "2": [{"name": "Acción astuta", "description": "Como acción adicional puedes Correr, Retirarte o Esconderte."}],
+      "3": [{"name": "Arquetipo de pícaro", "description": "Elige un arquetipo (p. ej. Ladrón) con rasgos a niveles 3, 9, 13 y 17."}],
+      "4": ["ASI"],
+      "5": [{"name": "Esquiva asombrosa", "description": "Como reacción reduces a la mitad el daño de un ataque de un atacante que puedas ver."}],
+      "6": [{"name": "Pericia", "description": "Elige dos habilidades más para duplicar tu competencia."}],
+      "7": [{"name": "Evasión", "description": "En salvaciones de Destreza para mitad de daño, no recibes daño si tienes éxito y la mitad si fallas."}],
+      "8": ["ASI"],
+      "9": [{"name": "Rasgo de arquetipo", "description": "Obtienes un rasgo de tu arquetipo de pícaro."}],
+      "10": ["ASI"],
+      "11": [{"name": "Talento fiable", "description": "En pruebas de habilidades competentes, un 9 o menos en el d20 cuenta como 10."}],
+      "12": ["ASI"],
+      "13": [{"name": "Rasgo de arquetipo", "description": "Obtienes un rasgo de tu arquetipo de pícaro."}],
+      "14": [{"name": "Sentido ciego", "description": "Sabes dónde están las criaturas escondidas o invisibles a 10 pies si puedes oír."}],
+      "15": [{"name": "Mente escurridiza", "description": "Ganas competencia en salvaciones de Sabiduría."}],
+      "16": ["ASI"],
+      "17": [{"name": "Rasgo de arquetipo", "description": "Obtienes un rasgo de tu arquetipo de pícaro."}],
+      "18": [{"name": "Escurridizo", "description": "Ningún ataque tiene ventaja contra ti mientras no estés incapacitado."}],
+      "19": ["ASI"],
+      "20": [{"name": "Golpe de suerte", "description": "Convierte un ataque fallido en impacto o una prueba fallida en un 20. 1 uso por descanso corto."}]
+    }
+  },
+  {
+    "slug": "sorcerer",
+    "name": "Hechicero",
+    "description": "Un lanzador de conjuros cuya magia innata proviene de un don o un linaje.",
+    "hit_die": 6,
+    "primary_abilities": ["cha"],
+    "saving_throws": ["con", "cha"],
+    "skill_choices": {"count": 2, "options": ["arcana", "deception", "insight", "intimidation", "persuasion", "religion"]},
+    "proficiencies": ["Daga", "Dardo", "Honda", "Bastón", "Ballesta ligera"],
+    "spellcasting": {"ability": "cha", "type": "full"},
+    "recommended_abilities": ["cha", "con", "dex", "wis", "int", "str"],
+    "starting_ac": {"base": 10, "dex": "full", "extra": null, "shield": false},
+    "starting_attacks": [
+      {"name": "Ballesta ligera", "ability": "dex", "damage_die": "1d8", "damage_type": "perforante", "notes": "Alcance (80/320)"},
+      {"name": "Daga", "ability": "finesse", "damage_die": "1d4", "damage_type": "perforante", "notes": "Arrojadiza (20/60)"}
+    ],
+    "starting_equipment": ["Ballesta ligera y 20 virotes", "Bolsa de componentes", "Paquete de explorador de mazmorras", "2 dagas"],
+    "subclass_label": "Origen hechicero",
+    "subclass_level": 1,
+    "features": {
+      "1": [
+        {"name": "Lanzamiento de conjuros", "description": "Conoces y lanzas conjuros de hechicero usando Carisma."},
+        {"name": "Origen hechicero", "description": "Elige el origen de tu poder (p. ej. Linaje dracónico) con rasgos a niveles 1, 6, 14 y 18."}
+      ],
+      "2": [{"name": "Fuente de magia", "description": "Puntos de hechicería = nivel de hechicero; puedes convertirlos en espacios de conjuro y viceversa."}],
+      "3": [{"name": "Metamagia", "description": "Eliges dos opciones de metamagia para modificar tus conjuros (una más a niveles 10 y 17)."}],
+      "4": ["ASI"],
+      "6": [{"name": "Rasgo de origen", "description": "Obtienes un rasgo de tu origen hechicero."}],
+      "8": ["ASI"],
+      "10": [{"name": "Metamagia", "description": "Aprendes una opción de metamagia adicional."}],
+      "12": ["ASI"],
+      "14": [{"name": "Rasgo de origen", "description": "Obtienes un rasgo de tu origen hechicero."}],
+      "16": ["ASI"],
+      "17": [{"name": "Metamagia", "description": "Aprendes una opción de metamagia adicional."}],
+      "18": [{"name": "Rasgo de origen", "description": "Obtienes un rasgo de tu origen hechicero."}],
+      "19": ["ASI"],
+      "20": [{"name": "Restauración hechicera", "description": "Recuperas 4 puntos de hechicería tras un descanso corto."}]
+    }
+  },
+  {
+    "slug": "warlock",
+    "name": "Brujo",
+    "description": "Un portador de magia derivada de un pacto con una entidad extraplanar.",
+    "hit_die": 8,
+    "primary_abilities": ["cha"],
+    "saving_throws": ["wis", "cha"],
+    "skill_choices": {"count": 2, "options": ["arcana", "deception", "history", "intimidation", "investigation", "nature", "religion"]},
+    "proficiencies": ["Armadura ligera", "Armas sencillas"],
+    "spellcasting": {"ability": "cha", "type": "pact"},
+    "recommended_abilities": ["cha", "con", "dex", "wis", "int", "str"],
+    "starting_ac": {"base": 11, "dex": "full", "extra": null, "shield": false},
+    "starting_attacks": [
+      {"name": "Ballesta ligera", "ability": "dex", "damage_die": "1d8", "damage_type": "perforante", "notes": "Alcance (80/320)"},
+      {"name": "Daga", "ability": "finesse", "damage_die": "1d4", "damage_type": "perforante", "notes": "Arrojadiza (20/60)"}
+    ],
+    "starting_equipment": ["Ballesta ligera y 20 virotes", "Bolsa de componentes", "Paquete de erudito", "Armadura de cuero", "Arma sencilla", "2 dagas"],
+    "subclass_label": "Patrón de otro mundo",
+    "subclass_level": 1,
+    "features": {
+      "1": [
+        {"name": "Patrón de otro mundo", "description": "Has pactado con un ser extraplanar (p. ej. El Infernal) que otorga rasgos a niveles 1, 6, 10 y 14."},
+        {"name": "Magia del pacto", "description": "Lanzas conjuros de brujo con Carisma. Tus espacios de conjuro son siempre del nivel máximo y se recuperan tras un descanso corto."}
+      ],
+      "2": [{"name": "Invocaciones sobrenaturales", "description": "Aprendes dos invocaciones que otorgan habilidades mágicas (más a niveles superiores)."}],
+      "3": [{"name": "Don del pacto", "description": "Tu patrón te otorga un don: Pacto de la cadena, del filo o del tomo."}],
+      "4": ["ASI"],
+      "6": [{"name": "Rasgo de patrón", "description": "Obtienes un rasgo de tu patrón de otro mundo."}],
+      "8": ["ASI"],
+      "10": [{"name": "Rasgo de patrón", "description": "Obtienes un rasgo de tu patrón de otro mundo."}],
+      "11": [{"name": "Arcano místico (6.º nivel)", "description": "Eliges un conjuro de 6.º nivel que puedes lanzar una vez por descanso largo sin gastar espacio."}],
+      "12": ["ASI"],
+      "13": [{"name": "Arcano místico (7.º nivel)", "description": "Eliges un conjuro de 7.º nivel como arcano místico."}],
+      "14": [{"name": "Rasgo de patrón", "description": "Obtienes un rasgo de tu patrón de otro mundo."}],
+      "15": [{"name": "Arcano místico (8.º nivel)", "description": "Eliges un conjuro de 8.º nivel como arcano místico."}],
+      "16": ["ASI"],
+      "17": [{"name": "Arcano místico (9.º nivel)", "description": "Eliges un conjuro de 9.º nivel como arcano místico."}],
+      "19": ["ASI"],
+      "20": [{"name": "Maestro sobrenatural", "description": "Una vez por descanso largo, en 1 minuto recuperas todos tus espacios de Magia del pacto."}]
+    }
+  },
+  {
+    "slug": "wizard",
+    "name": "Mago",
+    "description": "Un erudito de la magia capaz de manipular las estructuras de la realidad.",
+    "hit_die": 6,
+    "primary_abilities": ["int"],
+    "saving_throws": ["int", "wis"],
+    "skill_choices": {"count": 2, "options": ["arcana", "history", "insight", "investigation", "medicine", "religion"]},
+    "proficiencies": ["Daga", "Dardo", "Honda", "Bastón", "Ballesta ligera"],
+    "spellcasting": {"ability": "int", "type": "full"},
+    "recommended_abilities": ["int", "con", "dex", "wis", "cha", "str"],
+    "starting_ac": {"base": 10, "dex": "full", "extra": null, "shield": false},
+    "starting_attacks": [
+      {"name": "Bastón", "ability": "str", "damage_die": "1d6", "damage_type": "contundente", "notes": "Versátil (1d8)"},
+      {"name": "Daga", "ability": "finesse", "damage_die": "1d4", "damage_type": "perforante", "notes": "Arrojadiza (20/60)"}
+    ],
+    "starting_equipment": ["Bastón", "Bolsa de componentes", "Paquete de erudito", "Libro de conjuros"],
+    "subclass_label": "Tradición arcana",
+    "subclass_level": 2,
+    "features": {
+      "1": [
+        {"name": "Lanzamiento de conjuros", "description": "Preparas conjuros de tu libro de conjuros y los lanzas usando Inteligencia. Puedes lanzar rituales de tu libro."},
+        {"name": "Recuperación arcana", "description": "Una vez al día, tras un descanso corto recuperas espacios de conjuro cuya suma de niveles sea la mitad de tu nivel de mago (redondeando hacia arriba)."}
+      ],
+      "2": [{"name": "Tradición arcana", "description": "Elige una escuela (p. ej. Escuela de evocación) con rasgos a niveles 2, 6, 10 y 14."}],
+      "4": ["ASI"],
+      "6": [{"name": "Rasgo de tradición", "description": "Obtienes un rasgo de tu tradición arcana."}],
+      "8": ["ASI"],
+      "10": [{"name": "Rasgo de tradición", "description": "Obtienes un rasgo de tu tradición arcana."}],
+      "12": ["ASI"],
+      "14": [{"name": "Rasgo de tradición", "description": "Obtienes un rasgo de tu tradición arcana."}],
+      "16": ["ASI"],
+      "18": [{"name": "Dominio de conjuros", "description": "Eliges un conjuro de 1.er y otro de 2.º nivel que puedes lanzar a su nivel mínimo sin gastar espacios."}],
+      "19": ["ASI"],
+      "20": [{"name": "Conjuros característicos", "description": "Eliges dos conjuros de 3.er nivel siempre preparados que puedes lanzar una vez cada uno sin gastar espacio por descanso corto."}]
+    }
+  }
+]

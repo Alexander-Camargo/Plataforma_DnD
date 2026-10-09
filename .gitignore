@@ -1,0 +1,16 @@
+# Backend / Python
+venv/
+env/
+__pycache__/
+*.pyc
+.pytest_cache/
+.env
+
+# Docker
+uploaded_images/
+
+# IDEs / OS
+.vscode/
+.idea/
+*.DS_Store
+Thumbs.db

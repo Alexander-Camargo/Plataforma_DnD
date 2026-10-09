@@ -1,0 +1,44 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: dnd_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-dnd_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-dnd_pass}
+      POSTGRES_DB: ${POSTGRES_DB:-dnd_db}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: dnd_backend
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-dnd_user}:${POSTGRES_PASSWORD:-dnd_pass}@db:5432/${POSTGRES_DB:-dnd_db}
+      JWT_SECRET: ${JWT_SECRET:-super-secret-key-change-in-prod}
+      # Los nombres deben coincidir con app/core/config.py.
+      # Los valores por defecto son los mismos de config.py para no invalidar usuarios ya creados.
+      # EN PRODUCCIÓN define valores propios en un archivo .env (no se versiona).
+      DATA_ENCRYPTION_KEY: ${DATA_ENCRYPTION_KEY:-u0Zr0L5mJ0sQ8Xc1w2bq0m2zq7Y1kQ9C8vR3n4S5t6A=}
+      EMAIL_HASH_KEY: ${EMAIL_HASH_KEY:-change-me-email-pepper}
+    volumes:
+      - ./backend:/srv
+      - ./dnd_frontend/build/web:/srv/static
+      - uploaded_images:/srv/uploads
+    ports:
+      - "8000:8000"
+
+volumes:
+  pgdata:
+  uploaded_images:

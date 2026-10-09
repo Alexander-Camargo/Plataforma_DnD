@@ -1,0 +1,220 @@
+[
+  {
+    "slug": "human",
+    "name": "Humano",
+    "size": "Mediano",
+    "speed": 30,
+    "ability_bonuses": {"str": 1, "dex": 1, "con": 1, "int": 1, "wis": 1, "cha": 1},
+    "languages": ["Común"],
+    "extra_languages": 1,
+    "description": "Ambiciosos, adaptables y diversos; los humanos son la raza más extendida de los reinos.",
+    "traits": [
+      {"name": "Versatilidad humana", "description": "Todas tus puntuaciones de característica aumentan en 1."},
+      {"name": "Idioma adicional", "description": "Puedes hablar, leer y escribir un idioma adicional a tu elección."}
+    ],
+    "subraces": []
+  },
+  {
+    "slug": "dwarf",
+    "name": "Enano",
+    "size": "Mediano",
+    "speed": 25,
+    "ability_bonuses": {"con": 2},
+    "languages": ["Común", "Enano"],
+    "proficiencies": ["Hacha de batalla", "Hacha de mano", "Martillo ligero", "Martillo de guerra"],
+    "description": "Robustos, tenaces y leales a su clan; forjados en las profundidades de la montaña.",
+    "traits": [
+      {"name": "Visión en la oscuridad", "description": "Ves en luz tenue a 60 pies como si fuera luz brillante, y en oscuridad como si fuera luz tenue (sin colores)."},
+      {"name": "Resistencia enana", "description": "Ventaja en tiradas de salvación contra veneno y resistencia al daño por veneno."},
+      {"name": "Entrenamiento de combate enano", "description": "Competencia con hacha de batalla, hacha de mano, martillo ligero y martillo de guerra."},
+      {"name": "Afinidad con la piedra", "description": "Al hacer pruebas de Historia relacionadas con trabajos en piedra, añades el doble de tu bonificador de competencia."},
+      {"name": "Velocidad enana", "description": "Tu velocidad no se reduce por llevar armadura pesada."}
+    ],
+    "subraces": [
+      {
+        "slug": "hill_dwarf",
+        "name": "Enano de las colinas",
+        "ability_bonuses": {"wis": 1},
+        "hp_per_level": 1,
+        "traits": [{"name": "Dureza enana", "description": "Tus puntos de golpe máximos aumentan en 1, y en 1 más cada vez que subes de nivel."}]
+      },
+      {
+        "slug": "mountain_dwarf",
+        "name": "Enano de las montañas",
+        "ability_bonuses": {"str": 2},
+        "proficiencies": ["Armadura ligera", "Armadura media"],
+        "traits": [{"name": "Entrenamiento con armaduras enano", "description": "Competencia con armaduras ligeras y medias."}]
+      }
+    ]
+  },
+  {
+    "slug": "elf",
+    "name": "Elfo",
+    "size": "Mediano",
+    "speed": 30,
+    "ability_bonuses": {"dex": 2},
+    "languages": ["Común", "Élfico"],
+    "skills": ["perception"],
+    "description": "Gráciles y longevos, los elfos viven en armonía con la magia y la naturaleza.",
+    "traits": [
+      {"name": "Visión en la oscuridad", "description": "Ves en luz tenue a 60 pies como si fuera luz brillante, y en oscuridad como si fuera luz tenue."},
+      {"name": "Sentidos agudos", "description": "Tienes competencia en la habilidad Percepción."},
+      {"name": "Linaje feérico", "description": "Ventaja en salvaciones contra ser hechizado; la magia no puede dormirte."},
+      {"name": "Trance", "description": "No necesitas dormir: meditas 4 horas y obtienes el mismo beneficio que un humano tras 8 horas de sueño."}
+    ],
+    "subraces": [
+      {
+        "slug": "high_elf",
+        "name": "Alto elfo",
+        "ability_bonuses": {"int": 1},
+        "extra_languages": 1,
+        "proficiencies": ["Espada larga", "Espada corta", "Arco corto", "Arco largo"],
+        "traits": [
+          {"name": "Entrenamiento con armas élficas", "description": "Competencia con espada larga, espada corta, arco corto y arco largo."},
+          {"name": "Truco", "description": "Conoces un truco de la lista de conjuros de mago. Inteligencia es tu característica para lanzarlo."},
+          {"name": "Idioma adicional", "description": "Puedes hablar, leer y escribir un idioma adicional a tu elección."}
+        ]
+      },
+      {
+        "slug": "wood_elf",
+        "name": "Elfo de los bosques",
+        "ability_bonuses": {"wis": 1},
+        "speed": 35,
+        "proficiencies": ["Espada larga", "Espada corta", "Arco corto", "Arco largo"],
+        "traits": [
+          {"name": "Entrenamiento con armas élficas", "description": "Competencia con espada larga, espada corta, arco corto y arco largo."},
+          {"name": "Pies ligeros", "description": "Tu velocidad base es de 35 pies."},
+          {"name": "Máscara de la naturaleza", "description": "Puedes intentar esconderte incluso cuando solo te oculta ligeramente el follaje, la lluvia, la nieve o la niebla."}
+        ]
+      }
+    ]
+  },
+  {
+    "slug": "halfling",
+    "name": "Mediano",
+    "size": "Pequeño",
+    "speed": 25,
+    "ability_bonuses": {"dex": 2},
+    "languages": ["Común", "Mediano"],
+    "description": "Pequeños, alegres y sorprendentemente valientes; aman la comodidad del hogar.",
+    "traits": [
+      {"name": "Afortunado", "description": "Cuando sacas un 1 en el d20 de un ataque, prueba o salvación, puedes repetir la tirada y usar el nuevo resultado."},
+      {"name": "Valiente", "description": "Ventaja en salvaciones contra ser asustado."},
+      {"name": "Agilidad de mediano", "description": "Puedes moverte a través del espacio de cualquier criatura de un tamaño mayor que el tuyo."}
+    ],
+    "subraces": [
+      {
+        "slug": "lightfoot_halfling",
+        "name": "Mediano piesligeros",
+        "ability_bonuses": {"cha": 1},
+        "traits": [{"name": "Sigilo natural", "description": "Puedes intentar esconderte incluso cuando solo te oculta una criatura al menos un tamaño mayor que tú."}]
+      },
+      {
+        "slug": "stout_halfling",
+        "name": "Mediano fornido",
+        "ability_bonuses": {"con": 1},
+        "traits": [{"name": "Resistencia de los fornidos", "description": "Ventaja en salvaciones contra veneno y resistencia al daño por veneno."}]
+      }
+    ]
+  },
+  {
+    "slug": "dragonborn",
+    "name": "Dracónido",
+    "size": "Mediano",
+    "speed": 30,
+    "ability_bonuses": {"str": 2, "cha": 1},
+    "languages": ["Común", "Dracónico"],
+    "description": "Orgullosos descendientes de dragones, con escamas y aliento elemental.",
+    "traits": [
+      {"name": "Linaje dracónico", "description": "Elige un tipo de dragón; determina el tipo de daño de tu aliento y tu resistencia."},
+      {"name": "Arma de aliento", "description": "Como acción, exhalas energía destructiva (2d6, aumenta a 3d6 a nivel 6, 4d6 a nivel 11 y 5d6 a nivel 16). Salvación CD 8 + mod. de Constitución + competencia. Se recupera tras un descanso corto o largo."},
+      {"name": "Resistencia al daño", "description": "Tienes resistencia al tipo de daño asociado a tu linaje dracónico."}
+    ],
+    "subraces": []
+  },
+  {
+    "slug": "gnome",
+    "name": "Gnomo",
+    "size": "Pequeño",
+    "speed": 25,
+    "ability_bonuses": {"int": 2},
+    "languages": ["Común", "Gnomo"],
+    "description": "Curiosos e ingeniosos, los gnomos disfrutan de la vida, los inventos y las bromas.",
+    "traits": [
+      {"name": "Visión en la oscuridad", "description": "Ves en luz tenue a 60 pies como si fuera luz brillante, y en oscuridad como si fuera luz tenue."},
+      {"name": "Astucia gnoma", "description": "Ventaja en salvaciones de Inteligencia, Sabiduría y Carisma contra magia."}
+    ],
+    "subraces": [
+      {
+        "slug": "rock_gnome",
+        "name": "Gnomo de las rocas",
+        "ability_bonuses": {"con": 1},
+        "proficiencies": ["Herramientas de hojalatero"],
+        "traits": [
+          {"name": "Saber del artífice", "description": "En pruebas de Historia sobre objetos mágicos, alquímicos o tecnológicos añades el doble de tu competencia."},
+          {"name": "Manitas", "description": "Competencia con herramientas de hojalatero; puedes construir pequeños mecanismos de relojería."}
+        ]
+      },
+      {
+        "slug": "forest_gnome",
+        "name": "Gnomo de los bosques",
+        "ability_bonuses": {"dex": 1},
+        "traits": [
+          {"name": "Ilusionista nato", "description": "Conoces el truco Ilusión menor. Inteligencia es tu característica para lanzarlo."},
+          {"name": "Hablar con bestias pequeñas", "description": "Puedes comunicar ideas sencillas a bestias de tamaño Pequeño o menor."}
+        ]
+      }
+    ]
+  },
+  {
+    "slug": "half_elf",
+    "name": "Semielfo",
+    "size": "Mediano",
+    "speed": 30,
+    "ability_bonuses": {"cha": 2},
+    "bonus_choices": 2,
+    "skill_choices": 2,
+    "languages": ["Común", "Élfico"],
+    "extra_languages": 1,
+    "description": "Entre dos mundos, los semielfos combinan la curiosidad humana con la gracia élfica.",
+    "traits": [
+      {"name": "Visión en la oscuridad", "description": "Ves en luz tenue a 60 pies como si fuera luz brillante, y en oscuridad como si fuera luz tenue."},
+      {"name": "Linaje feérico", "description": "Ventaja en salvaciones contra ser hechizado; la magia no puede dormirte."},
+      {"name": "Versatilidad en habilidades", "description": "Ganas competencia en dos habilidades a tu elección."},
+      {"name": "Mejora de características", "description": "Además de +2 a Carisma, aumenta otras dos características en 1."}
+    ],
+    "subraces": []
+  },
+  {
+    "slug": "half_orc",
+    "name": "Semiorco",
+    "size": "Mediano",
+    "speed": 30,
+    "ability_bonuses": {"str": 2, "con": 1},
+    "languages": ["Común", "Orco"],
+    "skills": ["intimidation"],
+    "description": "Fuertes y resistentes, los semiorcos se abren camino con determinación feroz.",
+    "traits": [
+      {"name": "Visión en la oscuridad", "description": "Ves en luz tenue a 60 pies como si fuera luz brillante, y en oscuridad como si fuera luz tenue."},
+      {"name": "Amenazador", "description": "Tienes competencia en la habilidad Intimidación."},
+      {"name": "Aguante incansable", "description": "Cuando tus PG bajan a 0 sin morir, puedes quedarte con 1 PG. Se recupera tras un descanso largo."},
+      {"name": "Ataques salvajes", "description": "Al hacer un crítico cuerpo a cuerpo, tiras un dado de daño del arma adicional."}
+    ],
+    "subraces": []
+  },
+  {
+    "slug": "tiefling",
+    "name": "Tiflin",
+    "size": "Mediano",
+    "speed": 30,
+    "ability_bonuses": {"cha": 2, "int": 1},
+    "languages": ["Común", "Infernal"],
+    "description": "Marcados por un linaje infernal, los tiflin cargan con la desconfianza ajena.",
+    "traits": [
+      {"name": "Visión en la oscuridad", "description": "Ves en luz tenue a 60 pies como si fuera luz brillante, y en oscuridad como si fuera luz tenue."},
+      {"name": "Resistencia infernal", "description": "Tienes resistencia al daño por fuego."},
+      {"name": "Legado infernal", "description": "Conoces el truco Taumaturgia. A nivel 3 lanzas Reprensión infernal y a nivel 5 Oscuridad, una vez por descanso largo. Carisma es tu característica."}
+    ],
+    "subraces": []
+  }
+]
