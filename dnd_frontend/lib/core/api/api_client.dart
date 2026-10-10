@@ -13,7 +13,11 @@ class ApiException implements Exception {
 }
 
 class ApiClient {
+  // URL de la API forzada con --dart-define=API_URL=... (solo para desarrollo)
+  static const String _apiOverride = String.fromEnvironment('API_URL');
+
   static String get baseUrl {
+    if (_apiOverride.isNotEmpty) return _apiOverride;
     // Si estamos en la web, usamos el mismo dominio que está sirviendo la página
     // Esto hace que funcione perfectamente con ngrok.
     if (const bool.fromEnvironment('dart.library.html')) {
@@ -57,6 +61,14 @@ class ApiClient {
           Uri.parse('$baseUrl$endpoint'),
           headers: await _getHeaders(),
           body: jsonEncode(body),
+        ));
+    return _processResponse(response);
+  }
+
+  Future<dynamic> delete(String endpoint) async {
+    final response = await _send(() async => http.delete(
+          Uri.parse('$baseUrl$endpoint'),
+          headers: await _getHeaders(),
         ));
     return _processResponse(response);
   }

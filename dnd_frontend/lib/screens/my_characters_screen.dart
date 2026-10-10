@@ -51,6 +51,28 @@ class _MyCharactersScreenState extends State<MyCharactersScreen> {
     if (!ok) prov.fetchMyCharacters(); // Posible desincronización de versión
   }
 
+  Future<void> _deleteCharacter(Character char) async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Eliminar personaje'),
+        content: Text('¿Eliminar a ${char.name}? Esta acción no se puede deshacer.'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancelar')),
+          ElevatedButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Eliminar')),
+        ],
+      ),
+    );
+    if (confirm != true || !mounted) return;
+
+    final prov = context.read<CharacterProvider>();
+    final ok = await prov.deleteCharacter(char);
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(ok ? 'Personaje eliminado.' : (prov.lastError ?? 'Error al eliminar.'))),
+    );
+  }
+
   Widget _summaryChip(String label, String value) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -169,10 +191,22 @@ class _MyCharactersScreenState extends State<MyCharactersScreen> {
               ),
 
           const SizedBox(height: 16),
-          ElevatedButton.icon(
-            onPressed: () => context.go('/character/${char.id}'),
-            icon: const Icon(Icons.edit_document),
-            label: const Text('Abrir hoja de personaje'),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              ElevatedButton.icon(
+                onPressed: () => context.go('/character/${char.id}'),
+                icon: const Icon(Icons.edit_document),
+                label: const Text('Abrir hoja de personaje'),
+              ),
+              OutlinedButton.icon(
+                onPressed: char.inCampaign ? null : () => _deleteCharacter(char),
+                icon: const Icon(Icons.delete_outline),
+                label: const Text('Eliminar'),
+                style: OutlinedButton.styleFrom(foregroundColor: AppColors.accent),
+              ),
+            ],
           ),
         ],
       ),

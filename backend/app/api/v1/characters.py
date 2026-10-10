@@ -175,3 +175,20 @@ def update_character_status(
     db.commit()
     db.refresh(char)
     return char
+
+
+@router.delete("/{char_id}", status_code=204)
+def delete_character(
+    char_id: uuid.UUID,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    char = db.query(Character).filter(Character.id == char_id).first()
+    if not char:
+        raise HTTPException(status_code=404, detail="Personaje no encontrado")
+    if char.owner_id != current_user.id:
+        raise HTTPException(status_code=403, detail="Solo el dueño puede eliminar el personaje")
+    if char.campaign_id is not None:
+        raise HTTPException(status_code=409, detail="Termina la campaña activa antes de eliminar al personaje")
+    db.delete(char)
+    db.commit()
