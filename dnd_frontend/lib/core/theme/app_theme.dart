@@ -65,7 +65,7 @@ class AppTheme {
         iconColor: AppColors.accent,
         textColor: AppColors.text,
       ),
-      cardTheme: CardTheme(
+      cardTheme: CardThemeData(
         color: AppColors.bgCard,
         elevation: 0,
         margin: const EdgeInsets.only(bottom: 12),
@@ -75,7 +75,7 @@ class AppTheme {
         ),
       ),
       dividerTheme: const DividerThemeData(color: AppColors.border, space: 1),
-      dialogTheme: DialogTheme(
+      dialogTheme: DialogThemeData(
         backgroundColor: AppColors.bgCard,
         shape: RoundedRectangleBorder(
           side: const BorderSide(color: AppColors.gold, width: 1.5),
@@ -122,7 +122,7 @@ class AppTheme {
           borderSide: const BorderSide(color: AppColors.gold, width: 2),
         ),
       ),
-      tabBarTheme: const TabBarTheme(
+      tabBarTheme: const TabBarThemeData(
         labelColor: AppColors.gold,
         unselectedLabelColor: Color(0xFFAAAAAA),
         indicatorColor: AppColors.gold,
