@@ -1,0 +1,40 @@
+name: Deploy Release Pipeline
+
+on:
+  push:
+    branches:
+      - release
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-release
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    name: Build & Deploy Plataforma DnD
+    runs-on: [self-hosted, raspi]
+    steps:
+      - name: Update local repository to latest release
+        run: |
+          cd /home/ultimasl/1A-PROYECTOS/Plataforma_DnD
+          git fetch origin release
+          git reset --hard origin/release
+
+      - name: Build Flutter Web Frontend
+        run: |
+          cd /home/ultimasl/1A-PROYECTOS/Plataforma_DnD/dnd_frontend
+          flutter build web --release
+
+      - name: Rebuild & Restart Docker Containers
+        run: |
+          cd /home/ultimasl/1A-PROYECTOS/Plataforma_DnD
+          docker compose down
+          docker compose up -d --build
+
+      - name: Verify Container Health
+        run: |
+          echo "Waiting for services to become healthy..."
+          sleep 10
+          curl -f http://localhost:8000/health || (docker logs dnd_backend && exit 1)
+          echo "Deployment successful and healthy!"
