@@ -225,7 +225,7 @@ class _JoinCampaignDialogState extends State<_JoinCampaignDialog> {
             ),
             const SizedBox(height: 16),
             DropdownButtonFormField<Character>(
-              value: _selected,
+              initialValue: _selected,
               isExpanded: true,
               decoration: const InputDecoration(labelText: 'Personaje a usar'),
               items: widget.characters

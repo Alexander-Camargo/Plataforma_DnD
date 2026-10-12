@@ -50,6 +50,19 @@ class CharacterProvider extends ChangeNotifier {
     }
   }
 
+  Future<bool> deleteCharacter(Character char) async {
+    try {
+      await _api.delete('/characters/${char.id}');
+      _myCharacters = _myCharacters.where((c) => c.id != char.id).toList();
+      lastError = null;
+      notifyListeners();
+      return true;
+    } on ApiException catch (e) {
+      lastError = e.message;
+      return false;
+    }
+  }
+
   void _replace(Character updated) {
     _myCharacters = [
       for (final c in _myCharacters) c.id == updated.id ? updated : c,

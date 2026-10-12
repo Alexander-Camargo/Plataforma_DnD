@@ -235,3 +235,4 @@ class ContentWidth extends StatelessWidget {
     );
   }
 }
+

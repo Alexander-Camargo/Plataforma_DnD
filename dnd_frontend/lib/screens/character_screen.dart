@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../core/api/api_client.dart';
 import '../models/models.dart';
 import '../core/theme/app_theme.dart';
 import '../utils/pdf_generator.dart';
+import '../widgets/network_avatar.dart';
 
 class CharacterScreen extends StatefulWidget {
   final String characterId;
@@ -23,6 +25,7 @@ class _CharacterScreenState extends State<CharacterScreen> {
   final TextEditingController _caCtrl = TextEditingController();
   final TextEditingController _hpCtrl = TextEditingController();
   final TextEditingController _speedCtrl = TextEditingController();
+  final TextEditingController _avatarCtrl = TextEditingController();
 
   final TextEditingController _historyCtrl = TextEditingController();
   final TextEditingController _physicalCtrl = TextEditingController();
@@ -60,6 +63,7 @@ class _CharacterScreenState extends State<CharacterScreen> {
     _caCtrl.text = '${c.sheet['ac'] ?? 10}';
     _hpCtrl.text = '${c.sheet['hp'] ?? 10}';
     _speedCtrl.text = '${c.sheet['speed'] ?? 30}';
+    _avatarCtrl.text = c.avatarUrl ?? '';
 
     _historyCtrl.text = bg['history'] ?? '';
     _physicalCtrl.text = bg['physical'] ?? '';
@@ -89,6 +93,7 @@ class _CharacterScreenState extends State<CharacterScreen> {
 
       final data = await _api.patch('/characters/${_character!.id}', {
         'sheet': newSheet,
+        'avatar_url': _avatarCtrl.text.trim(),
         'version': _character!.version,
       });
 
@@ -180,7 +185,7 @@ class _CharacterScreenState extends State<CharacterScreen> {
         borderRadius: BorderRadius.circular(10),
         boxShadow: [
           BoxShadow(
-              color: Colors.black.withOpacity(0.04), blurRadius: 4, offset: const Offset(0, 2))
+              color: Colors.black.withValues(alpha: 0.04), blurRadius: 4, offset: const Offset(0, 2))
         ],
       ),
       child: Column(
@@ -231,7 +236,7 @@ class _CharacterScreenState extends State<CharacterScreen> {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-              color: Colors.black.withOpacity(0.03), blurRadius: 6, offset: const Offset(0, 3))
+              color: Colors.black.withValues(alpha: 0.03), blurRadius: 6, offset: const Offset(0, 3))
         ],
       ),
       child: Column(
@@ -324,6 +329,17 @@ class _CharacterScreenState extends State<CharacterScreen> {
         appBar: AppBar(
           backgroundColor: AppColors.bgDark, // Más limpio, todo oscuro
           foregroundColor: AppColors.gold,
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back),
+            tooltip: 'Volver',
+            onPressed: () {
+              if (context.canPop()) {
+                context.pop();
+              } else {
+                context.go('/my-characters');
+              }
+            },
+          ),
           title: Text(c.name,
               style: const TextStyle(
                   fontWeight: FontWeight.w600, letterSpacing: 1)),
@@ -607,28 +623,31 @@ class _CharacterScreenState extends State<CharacterScreen> {
                                         width: 4),
                                     borderRadius: BorderRadius.circular(8),
                                     color: AppColors.bgStat,
-                                    image: (c.avatarUrl != null &&
-                                            c.avatarUrl!.isNotEmpty)
-                                        ? DecorationImage(
-                                            image: NetworkImage(c.avatarUrl!),
-                                            fit: BoxFit.cover)
-                                        : null,
                                   ),
-                                  child: (c.avatarUrl == null ||
-                                          c.avatarUrl!.isEmpty)
-                                      ? const Center(
-                                          child: Icon(Icons.person,
-                                              size: 100, color: Colors.grey))
-                                      : null,
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(4),
+                                    child: NetworkAvatar(
+                                      url: c.avatarUrl,
+                                      width: 192,
+                                      height: 192,
+                                      placeholder: const Icon(Icons.person,
+                                        size: 100, color: Colors.grey),
+                                    ),
+                                  ),
                                 ),
                               ),
                               if (_isEditing)
-                                const Padding(
-                                    padding: EdgeInsets.only(top: 8.0),
-                                    child: Text(
-                                        'Edita la URL desde Forjar Personaje o ajusta directamente (WIP).',
-                                        style: TextStyle(
-                                            fontSize: 12, color: Colors.grey))),
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 12),
+                                  child: TextField(
+                                    controller: _avatarCtrl,
+                                    decoration: const InputDecoration(
+                                      labelText: 'URL de imagen (avatar)',
+                                      hintText: 'https://...',
+                                      isDense: true,
+                                    ),
+                                  ),
+                                ),
                             ]),
                           ),
                         ],

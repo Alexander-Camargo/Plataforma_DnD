@@ -190,7 +190,7 @@ class _CreateCharacterScreenState extends State<CreateCharacterScreen> {
 
   Widget _dropdown(String label, String value, List<String> items, ValueChanged<String> onChanged) {
     return DropdownButtonFormField<String>(
-      value: value,
+      initialValue: value,
       isExpanded: true,
       decoration: InputDecoration(labelText: label),
       items: items.map((i) => DropdownMenuItem(value: i, child: Text(i))).toList(),
