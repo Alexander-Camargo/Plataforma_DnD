@@ -18,10 +18,14 @@ class ApiClient {
 
   static String get baseUrl {
     if (_apiOverride.isNotEmpty) return _apiOverride;
-    // Si estamos en la web, usamos el mismo dominio que está sirviendo la página
-    // Esto hace que funcione perfectamente con ngrok.
+    // Si estamos en la web:
     if (const bool.fromEnvironment('dart.library.html')) {
-      return '${Uri.base.origin}/api/v1';
+      final base = Uri.base;
+      // Si estamos en un servidor de depuración local de Flutter (localhost con puerto distinto al 8000 del backend)
+      if ((base.host == 'localhost' || base.host == '127.0.0.1') && base.port != 8000) {
+        return 'http://localhost:8000/api/v1';
+      }
+      return '${base.origin}/api/v1';
     }
     // Para móvil/escritorio o pruebas locales
     return 'http://localhost:8000/api/v1';
