@@ -45,8 +45,17 @@ app.include_router(api_router, prefix="/api/v1")
 def health_check():
     return {"status": "ok", "env": settings.env}
 
+class NoCacheStaticFiles(StaticFiles):
+    async def get_response(self, path: str, scope):
+        response = await super().get_response(path, scope)
+        if path in ("", "index.html", "flutter_bootstrap.js", "version.json", "manifest.json", "flutter_service_worker.js"):
+            response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate, max-age=0"
+            response.headers["Pragma"] = "no-cache"
+            response.headers["Expires"] = "0"
+        return response
+
 # Servir Frontend compilado (si existe)
 # Esto permite usar ngrok en el puerto 8000 y servir tanto API como Web
 static_dir = Path("/srv/static")
 if static_dir.exists():
-    app.mount("/", StaticFiles(directory=str(static_dir), html=True), name="web")
+    app.mount("/", NoCacheStaticFiles(directory=str(static_dir), html=True), name="web")
