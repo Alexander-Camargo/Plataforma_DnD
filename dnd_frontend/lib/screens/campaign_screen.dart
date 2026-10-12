@@ -267,9 +267,8 @@ class _CampaignScreenState extends State<CampaignScreen> {
               padding: const EdgeInsets.all(16),
               buildDefaultDragHandles: false,
               itemCount: _characters.length,
-              onReorder: (oldIndex, newIndex) {
+              onReorderItem: (oldIndex, newIndex) {
                 setState(() {
-                  if (oldIndex < newIndex) newIndex -= 1;
                   _characters.insert(newIndex, _characters.removeAt(oldIndex));
                 });
               },
