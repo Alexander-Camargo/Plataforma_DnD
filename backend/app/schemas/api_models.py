@@ -1,9 +1,10 @@
 """Esquemas Pydantic para la API."""
+import re
 import uuid
 from datetime import datetime
 from typing import Any, Literal, Optional
 
-from pydantic import BaseModel, ConfigDict, EmailStr, Field
+from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_validator
 
 # Estados narrativos que puede asignar el DM
 CharacterStatus = Literal["alive", "dead", "undead", "resurrected", "race_changed", "lost"]
@@ -14,6 +15,21 @@ class UserCreate(BaseModel):
     username: str = Field(min_length=3, max_length=32, pattern=r"^[\w.\-]+$")
     email: EmailStr
     password: str = Field(min_length=8, max_length=128)
+
+    @field_validator("password")
+    @classmethod
+    def validate_secure_password(cls, v: str) -> str:
+        if len(v) < 8:
+            raise ValueError("La contraseña debe tener al menos 8 caracteres.")
+        if not re.search(r"[A-Z]", v):
+            raise ValueError("La contraseña debe contener al menos una letra mayúscula.")
+        if not re.search(r"[a-z]", v):
+            raise ValueError("La contraseña debe contener al menos una letra minúscula.")
+        if not re.search(r"\d", v):
+            raise ValueError("La contraseña debe contener al menos un número.")
+        if not re.search(r'[!@#$%^&*(),.?":{}|<>\-_=+[\]\\/;`~]', v):
+            raise ValueError("La contraseña debe contener al menos un carácter especial.")
+        return v
 
 class UserLogin(BaseModel):
     # Nombre de usuario O correo electrónico

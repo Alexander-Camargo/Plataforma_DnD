@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../core/theme/app_theme.dart';
 import '../providers/auth_provider.dart';
+import '../widgets/password_requirements_view.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -15,9 +16,11 @@ class _LoginScreenState extends State<LoginScreen> {
   final _userCtrl = TextEditingController();
   final _emailCtrl = TextEditingController();
   final _passCtrl = TextEditingController();
+  final _confirmPassCtrl = TextEditingController();
   bool _isRegister = false;
   bool _busy = false;
   bool _hidePass = true;
+  bool _hideConfirmPass = true;
   String? _error;
 
   @override
@@ -25,6 +28,7 @@ class _LoginScreenState extends State<LoginScreen> {
     _userCtrl.dispose();
     _emailCtrl.dispose();
     _passCtrl.dispose();
+    _confirmPassCtrl.dispose();
     super.dispose();
   }
 
@@ -128,8 +132,9 @@ class _LoginScreenState extends State<LoginScreen> {
                     TextFormField(
                       controller: _passCtrl,
                       obscureText: _hidePass,
-                      textInputAction: TextInputAction.done,
-                      onFieldSubmitted: (_) => _busy ? null : _submit(),
+                      textInputAction: _isRegister ? TextInputAction.next : TextInputAction.done,
+                      onChanged: (_) => setState(() {}),
+                      onFieldSubmitted: (_) => (!_isRegister && !_busy) ? _submit() : null,
                       decoration: InputDecoration(
                         labelText: 'Contraseña',
                         prefixIcon: const Icon(Icons.lock_outline),
@@ -139,11 +144,43 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ),
                       validator: (v) {
-                        if (v == null || v.isEmpty) return 'Campo obligatorio';
-                        if (_isRegister && v.length < 8) return 'Mínimo 8 caracteres';
+                        final val = v ?? '';
+                        if (val.isEmpty) return 'Campo obligatorio';
+                        if (_isRegister && !PasswordRequirementsView.isPasswordSecure(val)) {
+                          return 'La contraseña debe cumplir todos los requisitos de seguridad';
+                        }
                         return null;
                       },
                     ),
+                    if (_isRegister) ...[
+                      const SizedBox(height: 10),
+                      PasswordRequirementsView(
+                        password: _passCtrl.text,
+                        confirmPassword: _confirmPassCtrl.text,
+                      ),
+                      const SizedBox(height: 14),
+                      TextFormField(
+                        controller: _confirmPassCtrl,
+                        obscureText: _hideConfirmPass,
+                        textInputAction: TextInputAction.done,
+                        onChanged: (_) => setState(() {}),
+                        onFieldSubmitted: (_) => _busy ? null : _submit(),
+                        decoration: InputDecoration(
+                          labelText: 'Confirmar contraseña',
+                          prefixIcon: const Icon(Icons.lock_reset),
+                          suffixIcon: IconButton(
+                            icon: Icon(_hideConfirmPass ? Icons.visibility_off : Icons.visibility),
+                            onPressed: () => setState(() => _hideConfirmPass = !_hideConfirmPass),
+                          ),
+                        ),
+                        validator: (v) {
+                          if (!_isRegister) return null;
+                          if (v == null || v.isEmpty) return 'Confirma tu contraseña';
+                          if (v != _passCtrl.text) return 'Las contraseñas no coinciden';
+                          return null;
+                        },
+                      ),
+                    ],
                     if (_error != null) ...[
                       const SizedBox(height: 14),
                       Container(
@@ -174,6 +211,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           : () => setState(() {
                                 _isRegister = !_isRegister;
                                 _error = null;
+                                _confirmPassCtrl.clear();
                               }),
                       child: Text(_isRegister
                           ? '¿Ya tienes cuenta? Inicia sesión'

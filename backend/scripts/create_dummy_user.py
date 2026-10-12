@@ -19,12 +19,12 @@ def create_dummy():
         dummy_in = UserCreate(
             username="master",
             email="master@dnd.com",
-            password="password123"
+            password="Password123!"
         )
         user = create_user(db, dummy_in)
         print(f"Usuario Dummy creado exitosamente!")
         print(f"Email: {user.email_encrypted} (En BD está encriptado)")
-        print(f"Contraseña: password123")
+        print(f"Contraseña: Password123!")
     except Exception as e:
         print(f"No se pudo crear el usuario o ya existe: {e}")
     finally:
