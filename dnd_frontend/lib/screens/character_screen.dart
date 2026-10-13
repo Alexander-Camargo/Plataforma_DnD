@@ -156,7 +156,7 @@ class _CharacterScreenState extends State<CharacterScreen> {
                   fontWeight: FontWeight.w600,
                   color: AppColors.muted,
                   fontSize: 13)),
-          QuickHelp(topic: topicForLabel('Atributos')!),
+          QuickHelp(topic: topicForLabel(label)!),
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 2.0),
             child: Text(modStr,

@@ -152,64 +152,82 @@ class _CreateCharacterScreenState extends State<CreateCharacterScreen> {
         _pointsRemaining >=
             (DndRules.pointCosts[base + 1]! - DndRules.pointCosts[base]!);
 
+    final label = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Flexible(
+              child: Text(
+                '${DndRules.statNames[key]} (${key.toUpperCase()})',
+                style:
+                    const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+              ),
+            ),
+            QuickHelp(topic: topicForLabel(key)!),
+          ],
+        ),
+        if (racial > 0)
+          Text('+$racial racial ($_race)',
+              style: const TextStyle(color: AppColors.success, fontSize: 12)),
+      ],
+    );
+    final controls = Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        IconButton(
+          tooltip: 'Reducir ${DndRules.statNames[key]}',
+          icon:
+              const Icon(Icons.remove_circle_outline, color: AppColors.accent),
+          onPressed: base > 8
+              ? () => setState(() => _baseStats[key] = base - 1)
+              : null,
+        ),
+        Container(
+          width: 64,
+          padding: const EdgeInsets.symmetric(vertical: 6),
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: AppColors.bgStat,
+            border: Border.all(color: AppColors.borderStat, width: 1.5),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Column(
+            children: [
+              Text('${_finalStat(key)}',
+                  style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.accent)),
+              Text(_modText(DndRules.modifier(_finalStat(key))),
+                  style: const TextStyle(fontSize: 11, color: AppColors.muted)),
+            ],
+          ),
+        ),
+        IconButton(
+          tooltip: 'Aumentar ${DndRules.statNames[key]}',
+          icon: const Icon(Icons.add_circle_outline, color: AppColors.accent),
+          onPressed:
+              canAdd ? () => setState(() => _baseStats[key] = base + 1) : null,
+        ),
+      ],
+    );
+
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Row(
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  '${DndRules.statNames[key]} (${key.toUpperCase()})',
-                  style: const TextStyle(
-                      fontWeight: FontWeight.bold, fontSize: 15),
-                ),
-                if (racial > 0)
-                  Text('+$racial racial ($_race)',
-                      style: const TextStyle(
-                          color: AppColors.success, fontSize: 12)),
-              ],
-            ),
-          ),
-          IconButton(
-            icon: const Icon(Icons.remove_circle_outline,
-                color: AppColors.accent),
-            onPressed: base > 8
-                ? () => setState(() => _baseStats[key] = base - 1)
-                : null,
-          ),
-          QuickHelp(topic: topicForLabel('Atributos')!),
-          Container(
-            width: 64,
-            padding: const EdgeInsets.symmetric(vertical: 6),
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              color: AppColors.bgStat,
-              border: Border.all(color: AppColors.borderStat, width: 1.5),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Column(
-              children: [
-                Text('${_finalStat(key)}',
-                    style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.accent)),
-                Text(_modText(DndRules.modifier(_finalStat(key))),
-                    style:
-                        const TextStyle(fontSize: 11, color: AppColors.muted)),
-              ],
-            ),
-          ),
-          IconButton(
-            icon: const Icon(Icons.add_circle_outline, color: AppColors.accent),
-            onPressed: canAdd
-                ? () => setState(() => _baseStats[key] = base + 1)
-                : null,
-          ),
-        ],
-      ),
+      child: LayoutBuilder(builder: (context, constraints) {
+        if (constraints.maxWidth < 420) {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              label,
+              Align(alignment: Alignment.centerRight, child: controls)
+            ],
+          );
+        }
+        return Row(children: [Expanded(child: label), controls]);
+      }),
     );
   }
 
@@ -296,7 +314,9 @@ class _CreateCharacterScreenState extends State<CreateCharacterScreen> {
           },
           controlsBuilder: (context, details) => Padding(
             padding: const EdgeInsets.only(top: 16),
-            child: Row(
+            child: Wrap(
+              spacing: 12,
+              runSpacing: 8,
               children: [
                 ElevatedButton(
                   onPressed: _isSaving ? null : details.onStepContinue,
@@ -311,7 +331,6 @@ class _CreateCharacterScreenState extends State<CreateCharacterScreen> {
                           ? 'Guardar personaje'
                           : 'Siguiente'),
                 ),
-                const SizedBox(width: 12),
                 if (_currentStep > 0)
                   TextButton(
                     onPressed: _isSaving ? null : details.onStepCancel,
