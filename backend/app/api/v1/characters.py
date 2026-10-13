@@ -9,6 +9,9 @@ from app.api.deps import get_db, get_current_user
 from app.schemas.api_models import CharacterCreate, CharacterOut, CharacterUpdate, CharacterStatusUpdate
 from app.db.models import User, Character, Campaign, CampaignMember, StatusEvent
 
+from app.services.rules_catalog import creation_catalog, find_option
+from app.domain.rules import calculate_creation, refresh_derived_checks
+
 router = APIRouter()
 
 
@@ -50,18 +53,34 @@ def create_character(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
+    catalog = creation_catalog()
+    try:
+        race = find_option(catalog["races"], char_in.race, "Raza")
+        cls = find_option(catalog["classes"], char_in.class_slug, "Clase")
+        subrace = None
+        if race["subraces"]:
+            subrace = find_option(race["subraces"], char_in.subrace or "", "Subraza")
+        elif char_in.subrace:
+            raise ValueError("Esta raza no admite una subraza.")
+        if char_in.level != 1:
+            raise ValueError("El asistente crea personajes de nivel 1.")
+        sheet = calculate_creation(catalog, race, cls, subrace, char_in.creation.model_dump(), char_in.sheet)
+    except ValueError as error:
+        raise HTTPException(status_code=400, detail=str(error)) from error
+
     char = Character(
         owner_id=current_user.id,
         name=char_in.name.strip(),
-        race=char_in.race,
-        subrace=char_in.subrace,
-        class_slug=char_in.class_slug,
-        level=char_in.level,
+        race=race["name"],
+        subrace=subrace["id"] if subrace else None,
+        class_slug=cls["legacy_slug"],
+        level=1,
         avatar_url=char_in.avatar_url,
         status="alive",
         status_note="",
-        sheet=char_in.sheet
+        sheet=sheet,
     )
+
     db.add(char)
     db.commit()
     db.refresh(char)
@@ -136,6 +155,10 @@ def update_character(
         char.sheet = new_sheet
         char.campaign_id = None
 
+    try:
+        char.sheet = refresh_derived_checks(char.sheet, char.level, creation_catalog())
+    except ValueError as error:
+        raise HTTPException(status_code=400, detail=str(error)) from error
     char.version += 1
     db.commit()
     db.refresh(char)
@@ -171,6 +194,10 @@ def update_character_status(
     ))
     char.status = status_in.status
     char.status_note = status_in.status_note or ""
+    try:
+        char.sheet = refresh_derived_checks(char.sheet, char.level, creation_catalog())
+    except ValueError as error:
+        raise HTTPException(status_code=400, detail=str(error)) from error
     char.version += 1
     db.commit()
     db.refresh(char)

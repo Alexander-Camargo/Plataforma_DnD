@@ -1,3 +1,5 @@
+import '../core/data/dnd_rules.dart';
+
 class User {
   final String id;
   final String username;
@@ -70,13 +72,38 @@ class Character {
     required this.version,
   });
 
+  int _abilityModifier(String ability) {
+    final score = (sheet['stats'] as Map?)?[ability];
+    if (score is num) return ((score.toInt() - 10) / 2).floor();
+    return ((sheet['modifiers'] as Map?)?[ability] as num?)?.toInt() ?? 0;
+  }
+
+  int get proficiencyBonus => DndRules.proficiencyBonus(level);
+  bool isSaveProficient(String ability) =>
+      (sheet['saves'] as Map?)?[ability] == true;
+  bool isSkillProficient(String skill) =>
+      (sheet['skills'] as Map?)?[skill] == true;
+  bool hasExpertise(String skill) =>
+      (sheet['expertise'] as List?)?.contains(skill) ?? false;
+  int savingThrowBonus(String ability) =>
+      _abilityModifier(ability) +
+      (isSaveProficient(ability) ? proficiencyBonus : 0);
+  int skillBonus(String skill) =>
+      _abilityModifier(DndRules.skills[skill]!.attribute) +
+      (isSkillProficient(skill)
+          ? proficiencyBonus * (hasExpertise(skill) ? 2 : 1)
+          : 0);
+
   bool get inCampaign => campaignId != null;
 
   /// Campañas terminadas (se guardan en la hoja al retirar al personaje).
   List<Map<String, dynamic>> get campaignHistory {
     final raw = sheet['campaign_history'];
     if (raw is! List) return [];
-    return raw.whereType<Map>().map((e) => Map<String, dynamic>.from(e)).toList();
+    return raw
+        .whereType<Map>()
+        .map((e) => Map<String, dynamic>.from(e))
+        .toList();
   }
 
   factory Character.fromJson(Map<String, dynamic> json) {

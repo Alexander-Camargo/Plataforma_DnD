@@ -126,6 +126,7 @@ class CampaignTutorialScreen extends StatelessWidget {
               ]),
               _indexGroup(context, 'Crear y entender tu personaje', [
                 'race',
+                'subrace',
                 'class',
                 'alignment',
                 'abilities',
@@ -143,6 +144,14 @@ class CampaignTutorialScreen extends StatelessWidget {
                 'skills',
                 'equipment',
                 'spells',
+              ]),
+              _indexGroup(context, 'Competencias y pericia: cada habilidad', [
+                'skills',
+                'expertise',
+                'tool-thieves-tools',
+                ...tutorialTopics
+                    .where((topic) => topic.id.startsWith('skill-'))
+                    .map((topic) => topic.id)
               ]),
               _indexGroup(context, 'Organizar la campaña en la aplicación', [
                 'invitation',

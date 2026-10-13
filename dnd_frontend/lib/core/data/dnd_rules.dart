@@ -1,15 +1,29 @@
 /// Reglas de D&D 5e usadas por la creación y la subida de nivel.
 /// Las claves de clase/raza son los nombres tal como se muestran en la UI.
 class DndRules {
+  static String formatModifier(int value) => value >= 0 ? "+$value" : "$value";
   static const List<String> races = [
-    'Humano', 'Elfo', 'Enano', 'Mediano', 'Dracónido', 'Tiefling',
-    'Semielfo', 'Semiorco', 'Gnomo',
+    'Humano',
+    'Elfo',
+    'Enano',
+    'Mediano',
+    'Dracónido',
+    'Tiefling',
+    'Semielfo',
+    'Semiorco',
+    'Gnomo',
   ];
 
   static const List<String> alignments = [
-    'Legal Bueno', 'Neutral Bueno', 'Caótico Bueno',
-    'Legal Neutral', 'Verdadero Neutral', 'Caótico Neutral',
-    'Legal Malvado', 'Neutral Malvado', 'Caótico Malvado',
+    'Legal Bueno',
+    'Neutral Bueno',
+    'Caótico Bueno',
+    'Legal Neutral',
+    'Verdadero Neutral',
+    'Caótico Neutral',
+    'Legal Malvado',
+    'Neutral Malvado',
+    'Caótico Malvado',
   ];
 
   static const Map<String, String> statNames = {
@@ -51,7 +65,7 @@ class DndRules {
     'Mediano': {'des': 2},
     'Dracónido': {'fue': 2, 'car': 1},
     'Tiefling': {'car': 2, 'int': 1},
-    'Semielfo': {'car': 2, 'des': 1, 'int': 1},
+    'Semielfo': {'car': 2},
     'Semiorco': {'fue': 2, 'con': 1},
     'Gnomo': {'int': 2},
   };
@@ -62,18 +76,37 @@ class DndRules {
 
   /// Dado de golpe, salvaciones competentes y equipo inicial por clase.
   static const Map<String, ClassInfo> classes = {
-    'Bárbaro': ClassInfo(12, ['fue', 'con'], ['Gran Hacha', 'Jabalina x4', 'Paquete de explorador']),
-    'Bardo': ClassInfo(8, ['des', 'car'], ['Armadura de Cuero', 'Laúd', 'Estoque', 'Daga']),
-    'Brujo': ClassInfo(8, ['sab', 'car'], ['Armadura de Cuero', 'Arma Simple', 'Foco Arcano']),
-    'Clérigo': ClassInfo(8, ['sab', 'car'], ['Maza', 'Cota de Escamas', 'Símbolo Sagrado', 'Escudo']),
-    'Druida': ClassInfo(8, ['int', 'sab'], ['Escudo de Madera', 'Cimitarra', 'Armadura de Cuero']),
-    'Explorador': ClassInfo(10, ['fue', 'des'], ['Armadura de Escamas', 'Dos Espadas Cortas', 'Arco Largo']),
-    'Guerrero': ClassInfo(10, ['fue', 'con'], ['Cota de Mallas', 'Espada Larga', 'Escudo', 'Ballesta Ligera']),
-    'Hechicero': ClassInfo(6, ['con', 'car'], ['Ballesta Ligera', 'Foco Arcano', 'Dagas x2']),
-    'Mago': ClassInfo(6, ['int', 'sab'], ['Bastón', 'Libro de Conjuros', 'Foco Arcano', 'Túnica']),
-    'Monje': ClassInfo(8, ['fue', 'des'], ['Espada Corta', 'Paquete de Explorador', 'Dardos x10']),
-    'Paladín': ClassInfo(10, ['sab', 'car'], ['Espada Larga', 'Escudo', 'Cota de Mallas', 'Símbolo Sagrado']),
-    'Pícaro': ClassInfo(8, ['des', 'int'], ['Estoque', 'Arco Corto', 'Armadura de Cuero', 'Herramientas de Ladrón']),
+    'Bárbaro': ClassInfo(12, ['fue', 'con'],
+        ['Gran Hacha', 'Jabalina x4', 'Paquete de explorador']),
+    'Bardo': ClassInfo(
+        8, ['des', 'car'], ['Armadura de Cuero', 'Laúd', 'Estoque', 'Daga']),
+    'Brujo': ClassInfo(
+        8, ['sab', 'car'], ['Armadura de Cuero', 'Arma Simple', 'Foco Arcano']),
+    'Clérigo': ClassInfo(8, ['sab', 'car'],
+        ['Maza', 'Cota de Escamas', 'Símbolo Sagrado', 'Escudo']),
+    'Druida': ClassInfo(8, ['int', 'sab'],
+        ['Escudo de Madera', 'Cimitarra', 'Armadura de Cuero']),
+    'Explorador': ClassInfo(10, ['fue', 'des'],
+        ['Armadura de Escamas', 'Dos Espadas Cortas', 'Arco Largo']),
+    'Guerrero': ClassInfo(10, ['fue', 'con'],
+        ['Cota de Mallas', 'Espada Larga', 'Escudo', 'Ballesta Ligera']),
+    'Hechicero': ClassInfo(
+        6, ['con', 'car'], ['Ballesta Ligera', 'Foco Arcano', 'Dagas x2']),
+    'Mago': ClassInfo(6, ['int', 'sab'],
+        ['Bastón', 'Libro de Conjuros', 'Foco Arcano', 'Túnica']),
+    'Monje': ClassInfo(8, ['fue', 'des'],
+        ['Espada Corta', 'Paquete de Explorador', 'Dardos x10']),
+    'Paladín': ClassInfo(10, ['sab', 'car'],
+        ['Espada Larga', 'Escudo', 'Cota de Mallas', 'Símbolo Sagrado']),
+    'Pícaro': ClassInfo(8, [
+      'des',
+      'int'
+    ], [
+      'Estoque',
+      'Arco Corto',
+      'Armadura de Cuero',
+      'Herramientas de Ladrón'
+    ]),
   };
 
   /// Busca la clase por nombre sin importar mayúsculas (el backend guarda el slug en minúsculas).
@@ -116,7 +149,16 @@ class DndRules {
   }
 
   // ---- Compra de puntos (27 puntos) ----
-  static const Map<int, int> pointCosts = {8: 0, 9: 1, 10: 2, 11: 3, 12: 4, 13: 5, 14: 7, 15: 9};
+  static const Map<int, int> pointCosts = {
+    8: 0,
+    9: 1,
+    10: 2,
+    11: 3,
+    12: 4,
+    13: 5,
+    14: 7,
+    15: 9
+  };
   static const int pointBudget = 27;
 
   /// Estados que asigna el DM (clave API -> etiqueta).

@@ -1,0 +1,164 @@
+{
+  "ability_keys": {
+    "str": "fue",
+    "dex": "des",
+    "con": "con",
+    "int": "int",
+    "wis": "sab",
+    "cha": "car"
+  },
+  "skills": [
+    {
+      "id": "acrobatics",
+      "key": "acrobacias",
+      "name": "Acrobacias",
+      "ability": "dex"
+    },
+    {
+      "id": "animal_handling",
+      "key": "trato_animales",
+      "name": "Trato con animales",
+      "ability": "wis"
+    },
+    {
+      "id": "arcana",
+      "key": "arcanos",
+      "name": "Arcanos",
+      "ability": "int"
+    },
+    {
+      "id": "athletics",
+      "key": "atletismo",
+      "name": "Atletismo",
+      "ability": "str"
+    },
+    {
+      "id": "deception",
+      "key": "engano",
+      "name": "Engaño",
+      "ability": "cha"
+    },
+    {
+      "id": "history",
+      "key": "historia",
+      "name": "Historia",
+      "ability": "int"
+    },
+    {
+      "id": "insight",
+      "key": "perspicacia",
+      "name": "Perspicacia",
+      "ability": "wis"
+    },
+    {
+      "id": "intimidation",
+      "key": "intimidacion",
+      "name": "Intimidación",
+      "ability": "cha"
+    },
+    {
+      "id": "investigation",
+      "key": "investigacion",
+      "name": "Investigación",
+      "ability": "int"
+    },
+    {
+      "id": "medicine",
+      "key": "medicina",
+      "name": "Medicina",
+      "ability": "wis"
+    },
+    {
+      "id": "nature",
+      "key": "naturaleza",
+      "name": "Naturaleza",
+      "ability": "int"
+    },
+    {
+      "id": "perception",
+      "key": "percepcion",
+      "name": "Percepción",
+      "ability": "wis"
+    },
+    {
+      "id": "performance",
+      "key": "interpretacion",
+      "name": "Interpretación",
+      "ability": "cha"
+    },
+    {
+      "id": "persuasion",
+      "key": "persuasion",
+      "name": "Persuasión",
+      "ability": "cha"
+    },
+    {
+      "id": "religion",
+      "key": "religion",
+      "name": "Religión",
+      "ability": "int"
+    },
+    {
+      "id": "sleight_of_hand",
+      "key": "juego_manos",
+      "name": "Juego de manos",
+      "ability": "dex"
+    },
+    {
+      "id": "stealth",
+      "key": "sigilo",
+      "name": "Sigilo",
+      "ability": "dex"
+    },
+    {
+      "id": "survival",
+      "key": "supervivencia",
+      "name": "Supervivencia",
+      "ability": "wis"
+    }
+  ],
+  "point_budget": 27,
+  "point_costs": {
+    "8": 0,
+    "9": 1,
+    "10": 2,
+    "11": 3,
+    "12": 4,
+    "13": 5,
+    "14": 7,
+    "15": 9
+  },
+  "ability_limit": 20,
+  "base_min": 8,
+  "base_max": 15,
+  "bonus_choice_options": [
+    "str",
+    "dex",
+    "con",
+    "int",
+    "wis"
+  ],
+  "bonus_choice_amount": 1,
+  "initial_expertise": {
+    "rogue": {
+      "count": 2,
+      "tools": [
+        "thieves_tools"
+      ]
+    }
+  },
+  "unarmored_defense": {
+    "barbarian": [
+      "dex",
+      "con"
+    ],
+    "monk": [
+      "dex",
+      "wis"
+    ]
+  },
+  "tool_labels": {
+    "thieves_tools": "Herramientas de ladrón"
+  }
+}
+

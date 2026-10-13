@@ -1,3 +1,4 @@
+from tests.test_creation_rules import selection
 import uuid
 import pytest
 from sqlalchemy import select
@@ -73,7 +74,7 @@ def test_active_character_cannot_join_again(client, joined_world):
 def test_multiple_characters_do_not_duplicate_membership(client, joined_world, db):
     world = joined_world
     second = client.post("/api/v1/characters/", headers=world["player"]["headers"],
-                         json={"name": "Otro", "race": "Humano", "class_slug": "mago"}).json()
+                         json={"name": "Otro", "race": "Humano", "class_slug": "mago", "creation": selection(class_name="wizard")[4]}).json()
     assert client.post(PREFIX + "/join", headers=world["player"]["headers"], json={
         "join_code": world["campaign"]["join_code"], "character_id": second["id"]}).status_code == 200
     members = db.scalars(select(CampaignMember).where(

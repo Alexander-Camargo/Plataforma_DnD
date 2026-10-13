@@ -187,3 +187,9 @@ El `.gitignore` excluye los Markdown nuevos de referencia local, con una excepci
 
 `requirements.txt` y `requirements-dev.txt` sí se versionan: son necesarios para instalar las dependencias. El archivo `.env`, los informes de pruebas y las cachés se mantienen locales.
 
+
+### Creación de personajes: D&D 5e (2014)
+
+El catálogo del backend (`/api/v1/rules/creation`, requiere sesión) adapta los slugs de las tablas JSON a las claves españolas de las hojas existentes. La creación envía elecciones en `creation`: las seis puntuaciones base, bonificadores raciales elegibles, habilidades de clase/raza, trasfondo, sustituciones de competencias repetidas y pericias. El servidor valida la compra de 27 puntos (base 8–15) y calcula bonificadores de raza/subraza, habilidades, salvaciones, PG, velocidad y CA sin armadura. Las clases no asignan puntuaciones fijas. Las opciones de trasfondo indican su procedencia en el catálogo.
+
+El asistente crea nivel 1. El equipo y demás rasgos se completan con el DM; registrar equipo aún no calcula automáticamente la CA de armaduras. No se reasignan puntuaciones ni se inventan elecciones de competencias para personajes antiguos: sus datos guardados se conservan. La hoja y el PDF calculan los totales con las competencias y pericias registradas. Los tests usan SQLite efímera y una instantánea del catálogo para Flutter.

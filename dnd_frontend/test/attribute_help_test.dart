@@ -1,3 +1,4 @@
+import 'fixtures/creation_catalog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
@@ -32,7 +33,9 @@ void main() {
       addTearDown(tester.view.resetPhysicalSize);
       addTearDown(tester.view.resetDevicePixelRatio);
       final auth = _SignedInAuth();
-      final router = AppRouter.createRouter(auth)..go('/create-character');
+      final router =
+          AppRouter.createRouter(auth, creationCatalog: testCatalog())
+            ..go('/create-character');
       await tester.pumpWidget(ChangeNotifierProvider<AuthProvider>.value(
           value: auth,
           child:
@@ -85,7 +88,8 @@ void main() {
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
     final auth = _SignedInAuth();
-    final router = AppRouter.createRouter(auth)..go('/create-character');
+    final router = AppRouter.createRouter(auth, creationCatalog: testCatalog())
+      ..go('/create-character');
     await tester.pumpWidget(ChangeNotifierProvider<AuthProvider>.value(
         value: auth,
         child:

@@ -1,3 +1,4 @@
+import 'fixtures/creation_catalog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
@@ -15,7 +16,8 @@ class _SignedInAuth extends AuthProvider {
 void main() {
   testWidgets('Crear personaje exige nombre antes de avanzar', (tester) async {
     final auth = _SignedInAuth();
-    final router = AppRouter.createRouter(auth)..go('/create-character');
+    final router = AppRouter.createRouter(auth, creationCatalog: testCatalog())
+      ..go('/create-character');
     await tester.pumpWidget(ChangeNotifierProvider<AuthProvider>.value(
         value: auth,
         child:
@@ -32,7 +34,8 @@ void main() {
   testWidgets('El asistente conserva el nombre al avanzar y volver',
       (tester) async {
     final auth = _SignedInAuth();
-    final router = AppRouter.createRouter(auth)..go('/create-character');
+    final router = AppRouter.createRouter(auth, creationCatalog: testCatalog())
+      ..go('/create-character');
     await tester.pumpWidget(ChangeNotifierProvider<AuthProvider>.value(
         value: auth,
         child:

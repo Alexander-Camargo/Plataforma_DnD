@@ -1,3 +1,4 @@
+import 'fixtures/creation_catalog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
@@ -18,7 +19,7 @@ void main() {
   testWidgets('El router real abre la guía desde ayuda y desde el menú',
       (tester) async {
     final auth = _SignedInAuth();
-    final router = AppRouter.createRouter(auth);
+    final router = AppRouter.createRouter(auth, creationCatalog: testCatalog());
     router.go('/create-character');
     await tester.pumpWidget(ChangeNotifierProvider<AuthProvider>.value(
       value: auth,

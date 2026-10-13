@@ -95,8 +95,26 @@ class CharacterOut(CharacterBase):
     updated_at: datetime
     model_config = ConfigDict(from_attributes=True)
 
+class CharacterCreationChoices(BaseModel):
+    """Elecciones de nivel 1; las cifras finales se calculan en el servidor."""
+    base_stats: dict[str, int]
+    racial_abilities: list[str] = Field(default_factory=list)
+    class_skills: list[str] = Field(default_factory=list)
+    race_skills: list[str] = Field(default_factory=list)
+    background_id: str
+    replacement_skills: list[str] = Field(default_factory=list)
+    expertise: list[str] = Field(default_factory=list)
+
+    @field_validator("base_stats", mode="before")
+    @classmethod
+    def strict_base_scores(cls, value):
+        if not isinstance(value, dict) or any(type(score) is not int for score in value.values()):
+            raise ValueError("Las puntuaciones base deben ser enteros.")
+        return value
+
+
 class CharacterCreate(CharacterBase):
-    pass
+    creation: CharacterCreationChoices
 
 class CharacterUpdate(BaseModel):
     name: Optional[str] = Field(default=None, min_length=1, max_length=80)

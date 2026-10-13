@@ -1,3 +1,4 @@
+import 'fixtures/creation_catalog.dart';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -77,7 +78,8 @@ class _AppSession {
   final _Auth auth;
   final CampaignProvider campaigns = CampaignProvider();
   final CharacterProvider characters = CharacterProvider();
-  late final GoRouter router = AppRouter.createRouter(auth);
+  late final GoRouter router =
+      AppRouter.createRouter(auth, creationCatalog: testCatalog());
   _AppSession(String user) : auth = _Auth(user);
   Future<void> mount(WidgetTester tester, String path) async {
     router.go(path);

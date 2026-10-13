@@ -1,3 +1,4 @@
+import '../core/data/dnd_rules.dart';
 import 'package:flutter/material.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
@@ -15,7 +16,8 @@ class PdfGenerator {
     return s;
   }
 
-  static Future<void> generateCharacterSheet(BuildContext context, Character char) async {
+  static Future<void> generateCharacterSheet(
+      BuildContext context, Character char) async {
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Generando PDF... por favor espera.')),
     );
@@ -31,9 +33,10 @@ class PdfGenerator {
       }
 
       final pdf = pw.Document(
-        theme: baseFont != null 
-          ? pw.ThemeData.withFont(base: baseFont, bold: boldFont)
-          : pw.ThemeData.withFont(base: pw.Font.helvetica(), bold: pw.Font.helveticaBold()),
+        theme: baseFont != null
+            ? pw.ThemeData.withFont(base: baseFont, bold: boldFont)
+            : pw.ThemeData.withFont(
+                base: pw.Font.helvetica(), bold: pw.Font.helveticaBold()),
       );
 
       final stats = char.sheet['stats'] as Map<String, dynamic>? ?? {};
@@ -83,8 +86,8 @@ class PdfGenerator {
             children: [
               pw.Text(safeText(label), style: const pw.TextStyle(fontSize: 10)),
               pw.Text(mod(key),
-                  style:
-                      pw.TextStyle(fontSize: 18, fontWeight: pw.FontWeight.bold)),
+                  style: pw.TextStyle(
+                      fontSize: 18, fontWeight: pw.FontWeight.bold)),
               pw.Text('${stats[key] ?? 10}',
                   style: const pw.TextStyle(fontSize: 10)),
             ],
@@ -97,18 +100,17 @@ class PdfGenerator {
         return pw.Padding(
           padding: const pw.EdgeInsets.symmetric(vertical: 2),
           child: pw.Row(
-            mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-            children: [
-              pw.Row(
-                children: [
-                  pw.Text(isProficient ? 'X  ' : 'O  ',
-                      style: const pw.TextStyle(fontSize: 10)),
-                  pw.Text(safeText(label), style: const pw.TextStyle(fontSize: 12)),
-                ],
-              ),
-              pw.Text(safeText(value), style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
-            ],
-          ),
+              crossAxisAlignment: pw.CrossAxisAlignment.start,
+              children: [
+                pw.Text(isProficient ? 'X  ' : 'O  ',
+                    style: const pw.TextStyle(fontSize: 10)),
+                pw.Expanded(
+                    child: pw.Text(safeText(label),
+                        style: const pw.TextStyle(fontSize: 12))),
+                pw.SizedBox(width: 5),
+                pw.Text(safeText(value),
+                    style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+              ]),
         );
       }
 
@@ -132,7 +134,8 @@ class PdfGenerator {
                         children: [
                           pw.Text(safeText(char.name),
                               style: pw.TextStyle(
-                                  fontSize: 24, fontWeight: pw.FontWeight.bold)),
+                                  fontSize: 24,
+                                  fontWeight: pw.FontWeight.bold)),
                           pw.Text('Nombre del Personaje',
                               style: const pw.TextStyle(
                                   fontSize: 10, color: PdfColors.grey600)),
@@ -144,15 +147,19 @@ class PdfGenerator {
                       child: pw.Column(
                         children: [
                           pw.Row(
-                            mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                            mainAxisAlignment:
+                                pw.MainAxisAlignment.spaceBetween,
                             children: [
-                              pw.Text(safeText('Clase y Nivel: ${char.classSlug} ${char.level}')),
-                              pw.Text(safeText('Alineamiento: ${bg['alignment'] ?? '-'}')),
+                              pw.Text(safeText(
+                                  'Clase y Nivel: ${char.classSlug} ${char.level}')),
+                              pw.Text(safeText(
+                                  'Alineamiento: ${bg['alignment'] ?? '-'}')),
                             ],
                           ),
                           pw.SizedBox(height: 5),
                           pw.Row(
-                            mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                            mainAxisAlignment:
+                                pw.MainAxisAlignment.spaceBetween,
                             children: [
                               pw.Text(safeText('Raza: ${char.race}')),
                             ],
@@ -164,7 +171,6 @@ class PdfGenerator {
                 ),
               ),
               pw.SizedBox(height: 20),
-
               pw.Row(
                 crossAxisAlignment: pw.CrossAxisAlignment.start,
                 children: [
@@ -187,7 +193,6 @@ class PdfGenerator {
                     ),
                   ),
                   pw.SizedBox(width: 15),
-
                   pw.Expanded(
                     flex: 5,
                     child: pw.Column(
@@ -198,40 +203,59 @@ class PdfGenerator {
                           children: [
                             pw.Container(
                               padding: const pw.EdgeInsets.all(10),
-                              decoration: pw.BoxDecoration(border: pw.Border.all()),
+                              decoration:
+                                  pw.BoxDecoration(border: pw.Border.all()),
                               child: pw.Column(children: [
-                                pw.Text('CA', style: const pw.TextStyle(fontSize: 10)),
-                                pw.Text('${char.sheet['ac'] ?? 10}', style: pw.TextStyle(fontSize: 18, fontWeight: pw.FontWeight.bold)),
+                                pw.Text('CA',
+                                    style: const pw.TextStyle(fontSize: 10)),
+                                pw.Text('${char.sheet['ac'] ?? 10}',
+                                    style: pw.TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: pw.FontWeight.bold)),
                               ]),
                             ),
                             pw.Container(
                               padding: const pw.EdgeInsets.all(10),
-                              decoration: pw.BoxDecoration(border: pw.Border.all()),
+                              decoration:
+                                  pw.BoxDecoration(border: pw.Border.all()),
                               child: pw.Column(children: [
-                                pw.Text('INICIATIVA', style: const pw.TextStyle(fontSize: 10)),
-                                pw.Text(mod('des'), style: pw.TextStyle(fontSize: 18, fontWeight: pw.FontWeight.bold)),
+                                pw.Text('INICIATIVA',
+                                    style: const pw.TextStyle(fontSize: 10)),
+                                pw.Text(mod('des'),
+                                    style: pw.TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: pw.FontWeight.bold)),
                               ]),
                             ),
                             pw.Container(
                               padding: const pw.EdgeInsets.all(10),
-                              decoration: pw.BoxDecoration(border: pw.Border.all()),
+                              decoration:
+                                  pw.BoxDecoration(border: pw.Border.all()),
                               child: pw.Column(children: [
-                                pw.Text('VELOCIDAD', style: const pw.TextStyle(fontSize: 10)),
-                                pw.Text('${char.sheet['speed'] ?? 30} ft', style: pw.TextStyle(fontSize: 18, fontWeight: pw.FontWeight.bold)),
+                                pw.Text('VELOCIDAD',
+                                    style: const pw.TextStyle(fontSize: 10)),
+                                pw.Text('${char.sheet['speed'] ?? 30} ft',
+                                    style: pw.TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: pw.FontWeight.bold)),
                               ]),
                             ),
                             pw.Container(
                               padding: const pw.EdgeInsets.all(10),
-                              decoration: pw.BoxDecoration(border: pw.Border.all()),
+                              decoration:
+                                  pw.BoxDecoration(border: pw.Border.all()),
                               child: pw.Column(children: [
-                                pw.Text(safeText('PG MÁX'), style: const pw.TextStyle(fontSize: 10)),
-                                pw.Text('${char.sheet['hp'] ?? 10}', style: pw.TextStyle(fontSize: 18, fontWeight: pw.FontWeight.bold)),
+                                pw.Text(safeText('PG MÁX'),
+                                    style: const pw.TextStyle(fontSize: 10)),
+                                pw.Text('${char.sheet['hp'] ?? 10}',
+                                    style: pw.TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: pw.FontWeight.bold)),
                               ]),
                             ),
                           ],
                         ),
                         pw.SizedBox(height: 15),
-
                         pw.Row(
                           crossAxisAlignment: pw.CrossAxisAlignment.start,
                           children: [
@@ -240,12 +264,36 @@ class PdfGenerator {
                                 crossAxisAlignment: pw.CrossAxisAlignment.start,
                                 children: [
                                   sectionTitle('Tiradas de Salvación'),
-                                  buildListItem('Fuerza', mod('fue'), isProficient: saves['fue'] == true),
-                                  buildListItem('Destreza', mod('des'), isProficient: saves['des'] == true),
-                                  buildListItem('Constitución', mod('con'), isProficient: saves['con'] == true),
-                                  buildListItem('Inteligencia', mod('int'), isProficient: saves['int'] == true),
-                                  buildListItem('Sabiduría', mod('sab'), isProficient: saves['sab'] == true),
-                                  buildListItem('Carisma', mod('car'), isProficient: saves['car'] == true),
+                                  buildListItem(
+                                      'Fuerza',
+                                      DndRules.formatModifier(
+                                          char.savingThrowBonus('fue')),
+                                      isProficient: saves['fue'] == true),
+                                  buildListItem(
+                                      'Destreza',
+                                      DndRules.formatModifier(
+                                          char.savingThrowBonus('des')),
+                                      isProficient: saves['des'] == true),
+                                  buildListItem(
+                                      'Constitución',
+                                      DndRules.formatModifier(
+                                          char.savingThrowBonus('con')),
+                                      isProficient: saves['con'] == true),
+                                  buildListItem(
+                                      'Inteligencia',
+                                      DndRules.formatModifier(
+                                          char.savingThrowBonus('int')),
+                                      isProficient: saves['int'] == true),
+                                  buildListItem(
+                                      'Sabiduría',
+                                      DndRules.formatModifier(
+                                          char.savingThrowBonus('sab')),
+                                      isProficient: saves['sab'] == true),
+                                  buildListItem(
+                                      'Carisma',
+                                      DndRules.formatModifier(
+                                          char.savingThrowBonus('car')),
+                                      isProficient: saves['car'] == true),
                                 ],
                               ),
                             ),
@@ -254,14 +302,14 @@ class PdfGenerator {
                               child: pw.Column(
                                 crossAxisAlignment: pw.CrossAxisAlignment.start,
                                 children: [
-                                  sectionTitle('Habilidades Principales'),
-                                  buildListItem('Acrobacias (Des)', mod('des')),
-                                  buildListItem('Atletismo (Fue)', mod('fue')),
-                                  buildListItem('Engaño (Car)', mod('car')),
-                                  buildListItem('Historia (Int)', mod('int')),
-                                  buildListItem('Percepción (Sab)', mod('sab')),
-                                  buildListItem('Persuasión (Car)', mod('car')),
-                                  buildListItem('Sigilo (Des)', mod('des')),
+                                  sectionTitle('Habilidades'),
+                                  for (final entry in DndRules.skills.entries)
+                                    buildListItem(
+                                        '${entry.value.name}${char.hasExpertise(entry.key) ? " (Pericia)" : ""}',
+                                        DndRules.formatModifier(
+                                            char.skillBonus(entry.key)),
+                                        isProficient:
+                                            char.isSkillProficient(entry.key)),
                                 ],
                               ),
                             ),
@@ -273,7 +321,6 @@ class PdfGenerator {
                 ],
               ),
               pw.SizedBox(height: 20),
-
               pw.Wrap(
                 spacing: 20,
                 runSpacing: 20,
@@ -290,7 +337,9 @@ class PdfGenerator {
                         pw.SizedBox(height: 5),
                         pw.Text(safeText('Defectos: ${bg['flaws'] ?? '-'}')),
                         pw.SizedBox(height: 10),
-                        pw.Text(safeText(bg['history'] ?? 'Sin historia escrita.'), style: const pw.TextStyle(fontSize: 10)),
+                        pw.Text(
+                            safeText(bg['history'] ?? 'Sin historia escrita.'),
+                            style: const pw.TextStyle(fontSize: 10)),
                       ],
                     ),
                   ),
@@ -301,7 +350,8 @@ class PdfGenerator {
                       children: [
                         sectionTitle('Equipamiento'),
                         if (eq.isEmpty)
-                          pw.Text(safeText('Mochila vacía.'), style: const pw.TextStyle(color: PdfColors.grey))
+                          pw.Text(safeText('Mochila vacía.'),
+                              style: const pw.TextStyle(color: PdfColors.grey))
                         else
                           ...eq.map((item) => pw.Text(safeText('• $item'))),
                       ],
@@ -315,7 +365,7 @@ class PdfGenerator {
       );
 
       final bytes = await pdf.save();
-      
+
       if (context.mounted) {
         ScaffoldMessenger.of(context).hideCurrentSnackBar();
       }
@@ -330,7 +380,6 @@ class PdfGenerator {
         ..setAttribute('download', fileName)
         ..click();
       html.Url.revokeObjectUrl(url);
-
     } catch (e) {
       debugPrint('Error al generar PDF: $e');
       if (context.mounted) {

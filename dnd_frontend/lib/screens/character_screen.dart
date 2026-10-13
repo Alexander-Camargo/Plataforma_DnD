@@ -1,3 +1,4 @@
+import '../core/data/dnd_rules.dart';
 import 'package:flutter/material.dart';
 import '../widgets/quick_help.dart';
 import '../core/data/tutorial_topics.dart';
@@ -277,26 +278,18 @@ class _CharacterScreenState extends State<CharacterScreen> {
   Widget _buildListItem(String label, String value,
       {bool isProficient = false}) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Row(
-            children: [
-              if (isProficient)
-                const Text('● ',
-                    style: TextStyle(color: AppColors.accent, fontSize: 12))
-              else
-                const Text('○ ',
-                    style: TextStyle(color: Colors.grey, fontSize: 12)),
-              Text(label, style: const TextStyle(fontSize: 14)),
-            ],
-          ),
-          Text(value,
-              style: const TextStyle(
-                  fontWeight: FontWeight.bold, color: AppColors.accent)),
-        ],
-      ),
+      padding: const EdgeInsets.symmetric(vertical: 6),
+      child: Row(children: [
+        Text(isProficient ? '● ' : '○ ',
+            style: TextStyle(
+                color: isProficient ? AppColors.accent : Colors.grey,
+                fontSize: 12)),
+        Expanded(child: Text(label, style: const TextStyle(fontSize: 14))),
+        const SizedBox(width: 8),
+        Text(value,
+            style: const TextStyle(
+                fontWeight: FontWeight.bold, color: AppColors.accent)),
+      ]),
     );
   }
 
@@ -555,23 +548,35 @@ class _CharacterScreenState extends State<CharacterScreen> {
                                     ),
                                     const SizedBox(height: 16),
                                     _buildListCard('Tiradas de Salvación', [
-                                      _buildListItem('Fuerza',
-                                          (mods['fue'] ?? 0).toString(),
+                                      _buildListItem(
+                                          'Fuerza',
+                                          DndRules.formatModifier(
+                                              c.savingThrowBonus('fue')),
                                           isProficient: saves['fue'] == true),
-                                      _buildListItem('Destreza',
-                                          (mods['des'] ?? 0).toString(),
+                                      _buildListItem(
+                                          'Destreza',
+                                          DndRules.formatModifier(
+                                              c.savingThrowBonus('des')),
                                           isProficient: saves['des'] == true),
-                                      _buildListItem('Constitución',
-                                          (mods['con'] ?? 0).toString(),
+                                      _buildListItem(
+                                          'Constitución',
+                                          DndRules.formatModifier(
+                                              c.savingThrowBonus('con')),
                                           isProficient: saves['con'] == true),
-                                      _buildListItem('Inteligencia',
-                                          (mods['int'] ?? 0).toString(),
+                                      _buildListItem(
+                                          'Inteligencia',
+                                          DndRules.formatModifier(
+                                              c.savingThrowBonus('int')),
                                           isProficient: saves['int'] == true),
-                                      _buildListItem('Sabiduría',
-                                          (mods['sab'] ?? 0).toString(),
+                                      _buildListItem(
+                                          'Sabiduría',
+                                          DndRules.formatModifier(
+                                              c.savingThrowBonus('sab')),
                                           isProficient: saves['sab'] == true),
-                                      _buildListItem('Carisma',
-                                          (mods['car'] ?? 0).toString(),
+                                      _buildListItem(
+                                          'Carisma',
+                                          DndRules.formatModifier(
+                                              c.savingThrowBonus('car')),
                                           isProficient: saves['car'] == true),
                                     ]),
                                   ],
@@ -580,20 +585,13 @@ class _CharacterScreenState extends State<CharacterScreen> {
                               const SizedBox(width: 20),
                               Expanded(
                                 child: _buildListCard('Habilidades', [
-                                  _buildListItem('Acrobacias (Des)',
-                                      '${mods['des'] ?? 0}'),
-                                  _buildListItem(
-                                      'Atletismo (Fue)', '${mods['fue'] ?? 0}'),
-                                  _buildListItem(
-                                      'Engaño (Car)', '${mods['car'] ?? 0}'),
-                                  _buildListItem(
-                                      'Historia (Int)', '${mods['int'] ?? 0}'),
-                                  _buildListItem('Percepción (Sab)',
-                                      '${mods['sab'] ?? 0}'),
-                                  _buildListItem('Persuasión (Car)',
-                                      '${mods['car'] ?? 0}'),
-                                  _buildListItem(
-                                      'Sigilo (Des)', '${mods['des'] ?? 0}'),
+                                  for (final entry in DndRules.skills.entries)
+                                    _buildListItem(
+                                        '${entry.value.name} (${entry.value.attribute.toUpperCase()})${c.hasExpertise(entry.key) ? " · Pericia" : ""}',
+                                        DndRules.formatModifier(
+                                            c.skillBonus(entry.key)),
+                                        isProficient:
+                                            c.isSkillProficient(entry.key)),
                                 ]),
                               ),
                             ],

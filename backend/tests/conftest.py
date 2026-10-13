@@ -11,6 +11,7 @@ os.environ["JWT_SECRET"] = "test-only-secret-not-for-production-123456"
 os.environ["EMAIL_HASH_KEY"] = "test-only-email-index"
 
 import pytest
+from tests.test_creation_rules import selection
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine, event
 from sqlalchemy.orm import Session
@@ -74,7 +75,7 @@ def world(client, actors):
                            json={"name": "La frontera", "description": "Una aventura"}).json()
     character = client.post("/api/v1/characters/", headers=actors["player"]["headers"],
                             json={"name": "Lina", "race": "Humano", "class_slug": "guerrero",
-                                  "sheet": {"stats": {"fue": 14, "con": 14}, "hp": 12}}).json()
+                                  "creation": selection()[4], "sheet": {}}).json()
     return {"campaign": campaign, "character": character, **actors}
 
 

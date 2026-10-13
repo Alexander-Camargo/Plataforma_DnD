@@ -1,3 +1,4 @@
+import '../../models/creation_catalog.dart';
 import 'package:go_router/go_router.dart';
 import '../../providers/auth_provider.dart';
 import '../../screens/login_screen.dart';
@@ -10,7 +11,8 @@ import '../../screens/my_characters_screen.dart';
 import '../../screens/campaign_tutorial_screen.dart';
 
 class AppRouter {
-  static GoRouter createRouter(AuthProvider authProvider) {
+  static GoRouter createRouter(AuthProvider authProvider,
+      {CreationCatalog? creationCatalog}) {
     return GoRouter(
       initialLocation: '/',
       refreshListenable: authProvider,
@@ -40,7 +42,8 @@ class AppRouter {
             builder: (context, state) => const DmDashboardScreen()),
         GoRoute(
             path: '/create-character',
-            builder: (context, state) => const CreateCharacterScreen()),
+            builder: (context, state) =>
+                CreateCharacterScreen(catalog: creationCatalog)),
         GoRoute(
           path: '/campaign/:id',
           builder: (context, state) =>
