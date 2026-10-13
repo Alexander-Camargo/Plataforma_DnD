@@ -48,7 +48,7 @@ def health_check():
 class NoCacheStaticFiles(StaticFiles):
     async def get_response(self, path: str, scope):
         response = await super().get_response(path, scope)
-        if path in ("", "index.html", "flutter_bootstrap.js", "version.json", "manifest.json", "flutter_service_worker.js"):
+        if path in (".", "", "index.html", "flutter_bootstrap.js", "version.json", "manifest.json", "flutter_service_worker.js"):
             response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate, max-age=0"
             response.headers["Pragma"] = "no-cache"
             response.headers["Expires"] = "0"

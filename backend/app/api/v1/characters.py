@@ -117,7 +117,7 @@ def update_character(
 
     if char_in.sheet is not None:
         stats = char_in.sheet.get("stats", {})
-        if any(not isinstance(v, int) or v < 1 or v > 20 for v in stats.values()):
+        if any(type(v) is not int or v < 1 or v > 20 for v in stats.values()):
             raise HTTPException(status_code=400, detail="Las puntuaciones deben estar entre 1 y 20")
         char.sheet = char_in.sheet
 

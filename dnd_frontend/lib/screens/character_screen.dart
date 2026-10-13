@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../widgets/quick_help.dart';
+import '../core/data/tutorial_topics.dart';
 import 'package:go_router/go_router.dart';
 import '../core/api/api_client.dart';
 import '../models/models.dart';
@@ -104,7 +106,7 @@ class _CharacterScreenState extends State<CharacterScreen> {
           _isSaving = false;
         });
         if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
+        ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Cambios guardados con éxito.')));
       }
     } catch (e) {
@@ -154,6 +156,7 @@ class _CharacterScreenState extends State<CharacterScreen> {
                   fontWeight: FontWeight.w600,
                   color: AppColors.muted,
                   fontSize: 13)),
+          QuickHelp(topic: topicForLabel('Atributos')!),
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 2.0),
             child: Text(modStr,
@@ -165,8 +168,8 @@ class _CharacterScreenState extends State<CharacterScreen> {
           Container(
             padding: const EdgeInsets.only(top: 2),
             decoration: const BoxDecoration(
-                border: Border(
-                    top: BorderSide(color: AppColors.gold, width: 1))),
+                border:
+                    Border(top: BorderSide(color: AppColors.gold, width: 1))),
             child: Text('$score',
                 style: const TextStyle(fontSize: 13, color: AppColors.muted)),
           ),
@@ -185,7 +188,9 @@ class _CharacterScreenState extends State<CharacterScreen> {
         borderRadius: BorderRadius.circular(10),
         boxShadow: [
           BoxShadow(
-              color: Colors.black.withValues(alpha: 0.04), blurRadius: 4, offset: const Offset(0, 2))
+              color: Colors.black.withValues(alpha: 0.04),
+              blurRadius: 4,
+              offset: const Offset(0, 2))
         ],
       ),
       child: Column(
@@ -202,6 +207,8 @@ class _CharacterScreenState extends State<CharacterScreen> {
                     fontWeight: FontWeight.w600,
                     fontSize: 13)),
           ),
+          if (topicForLabel(title) != null)
+            QuickHelp(topic: topicForLabel(title)!),
           const SizedBox(height: 6),
           if (_isEditing && ctrl != null)
             TextField(
@@ -236,7 +243,9 @@ class _CharacterScreenState extends State<CharacterScreen> {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-              color: Colors.black.withValues(alpha: 0.03), blurRadius: 6, offset: const Offset(0, 3))
+              color: Colors.black.withValues(alpha: 0.03),
+              blurRadius: 6,
+              offset: const Offset(0, 3))
         ],
       ),
       child: Column(
@@ -254,6 +263,11 @@ class _CharacterScreenState extends State<CharacterScreen> {
                     fontSize: 14,
                     letterSpacing: 0.5)),
           ),
+          if (topicForLabel(title) != null)
+            Align(
+              alignment: Alignment.centerRight,
+              child: QuickHelp(topic: topicForLabel(title)!),
+            ),
           ...children,
         ],
       ),
@@ -300,8 +314,8 @@ class _CharacterScreenState extends State<CharacterScreen> {
       );
     }
     return Text(text.isEmpty ? 'No definido.' : text,
-        style: const TextStyle(
-            fontSize: 14, color: AppColors.text, height: 1.5));
+        style:
+            const TextStyle(fontSize: 14, color: AppColors.text, height: 1.5));
   }
 
   @override
@@ -371,7 +385,8 @@ class _CharacterScreenState extends State<CharacterScreen> {
               ),
             ] else ...[
               IconButton(
-                onPressed: () => PdfGenerator.generateCharacterSheet(context, _character!),
+                onPressed: () =>
+                    PdfGenerator.generateCharacterSheet(context, _character!),
                 icon: const Icon(Icons.picture_as_pdf),
                 tooltip: 'Descargar PDF',
               ),
@@ -451,8 +466,8 @@ class _CharacterScreenState extends State<CharacterScreen> {
                                     ? AppColors.accent
                                     : AppColors.muted,
                                 borderRadius: BorderRadius.circular(12),
-                                border: Border.all(
-                                    color: AppColors.gold, width: 1),
+                                border:
+                                    Border.all(color: AppColors.gold, width: 1),
                               ),
                               child: Text(
                                 c.campaignId != null
@@ -619,8 +634,7 @@ class _CharacterScreenState extends State<CharacterScreen> {
                                   height: 200,
                                   decoration: BoxDecoration(
                                     border: Border.all(
-                                        color: AppColors.gold,
-                                        width: 4),
+                                        color: AppColors.gold, width: 4),
                                     borderRadius: BorderRadius.circular(8),
                                     color: AppColors.bgStat,
                                   ),
@@ -631,7 +645,7 @@ class _CharacterScreenState extends State<CharacterScreen> {
                                       width: 192,
                                       height: 192,
                                       placeholder: const Icon(Icons.person,
-                                        size: 100, color: Colors.grey),
+                                          size: 100, color: Colors.grey),
                                     ),
                                   ),
                                 ),

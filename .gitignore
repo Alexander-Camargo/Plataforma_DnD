@@ -17,3 +17,11 @@ Thumbs.db
 
 # Documentación Markdown local
 *.[mM][dD]
+# README del proyecto versionado
+!/README.md
+
+# Informes locales de pruebas
+.coverage*
+htmlcov/
+coverage/
+*.lcov

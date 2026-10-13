@@ -10,19 +10,23 @@ void main() {
       // Missing length
       expect(PasswordRequirementsView.isPasswordSecure('Ab1!'), isFalse);
       // Missing uppercase
-      expect(PasswordRequirementsView.isPasswordSecure('password123!'), isFalse);
+      expect(
+          PasswordRequirementsView.isPasswordSecure('password123!'), isFalse);
       // Missing lowercase
-      expect(PasswordRequirementsView.isPasswordSecure('PASSWORD123!'), isFalse);
+      expect(
+          PasswordRequirementsView.isPasswordSecure('PASSWORD123!'), isFalse);
       // Missing number
       expect(PasswordRequirementsView.isPasswordSecure('Password!@#'), isFalse);
       // Missing special char
       expect(PasswordRequirementsView.isPasswordSecure('Password123'), isFalse);
       // Valid password
       expect(PasswordRequirementsView.isPasswordSecure('Password123!'), isTrue);
-      expect(PasswordRequirementsView.isPasswordSecure('D&dRules2026#'), isTrue);
+      expect(
+          PasswordRequirementsView.isPasswordSecure('D&dRules2026#'), isTrue);
     });
 
-    testWidgets('PasswordRequirementsView renders live checkboxes', (WidgetTester tester) async {
+    testWidgets('PasswordRequirementsView renders live checkboxes',
+        (WidgetTester tester) async {
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(
@@ -45,10 +49,13 @@ void main() {
       // 'Pass' has uppercase and lowercase, but not 8 chars, number, or special
       // Check that checkboxes are present
       expect(find.byIcon(Icons.check_box_rounded), findsNWidgets(2));
-      expect(find.byIcon(Icons.check_box_outline_blank_rounded), findsNWidgets(3));
+      expect(
+          find.byIcon(Icons.check_box_outline_blank_rounded), findsNWidgets(3));
     });
 
-    testWidgets('PasswordRequirementsView marks all fulfilled when password is secure', (WidgetTester tester) async {
+    testWidgets(
+        'PasswordRequirementsView marks all fulfilled when password is secure',
+        (WidgetTester tester) async {
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(

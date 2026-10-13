@@ -4,6 +4,8 @@ import '../core/api/api_client.dart';
 import '../core/data/dnd_rules.dart';
 import '../core/theme/app_theme.dart';
 import '../widgets/main_drawer.dart';
+import '../widgets/quick_help.dart';
+import '../core/data/tutorial_topics.dart';
 
 class CreateCharacterScreen extends StatefulWidget {
   const CreateCharacterScreen({super.key});
@@ -26,7 +28,9 @@ class _CreateCharacterScreenState extends State<CreateCharacterScreen> {
   String _alignment = 'Verdadero Neutral';
 
   // Paso 2: atributos (compra de puntos)
-  final Map<String, int> _baseStats = {for (final k in DndRules.statNames.keys) k: 8};
+  final Map<String, int> _baseStats = {
+    for (final k in DndRules.statNames.keys) k: 8
+  };
 
   // Paso 3: trasfondo
   final _avatarCtrl = TextEditingController();
@@ -37,15 +41,22 @@ class _CreateCharacterScreenState extends State<CreateCharacterScreen> {
 
   @override
   void dispose() {
-    for (final c in [_nameCtrl, _avatarCtrl, _historyCtrl, _idealsCtrl, _bondsCtrl, _flawsCtrl]) {
+    for (final c in [
+      _nameCtrl,
+      _avatarCtrl,
+      _historyCtrl,
+      _idealsCtrl,
+      _bondsCtrl,
+      _flawsCtrl
+    ]) {
       c.dispose();
     }
     super.dispose();
   }
 
   // ---------- Reglas ----------
-  int get _pointsSpent =>
-      _baseStats.values.fold(0, (sum, v) => sum + (DndRules.pointCosts[v] ?? 0));
+  int get _pointsSpent => _baseStats.values
+      .fold(0, (sum, v) => sum + (DndRules.pointCosts[v] ?? 0));
   int get _pointsRemaining => DndRules.pointBudget - _pointsSpent;
 
   int _racial(String stat) => DndRules.racialBonuses[_race]?[stat] ?? 0;
@@ -89,14 +100,17 @@ class _CreateCharacterScreenState extends State<CreateCharacterScreen> {
     try {
       final info = DndRules.classInfo(_class);
       final stats = {for (final k in _baseStats.keys) k: _finalStat(k)};
-      final mods = {for (final e in stats.entries) e.key: DndRules.modifier(e.value)};
+      final mods = {
+        for (final e in stats.entries) e.key: DndRules.modifier(e.value)
+      };
 
       await _api.post('/characters/', {
         'name': _nameCtrl.text.trim(),
         'race': _race,
         'class_slug': _class.toLowerCase(),
         'level': 1,
-        'avatar_url': _avatarCtrl.text.trim().isEmpty ? null : _avatarCtrl.text.trim(),
+        'avatar_url':
+            _avatarCtrl.text.trim().isEmpty ? null : _avatarCtrl.text.trim(),
         'sheet': {
           'stats': stats,
           'modifiers': mods,
@@ -135,7 +149,8 @@ class _CreateCharacterScreenState extends State<CreateCharacterScreen> {
     final base = _baseStats[key]!;
     final racial = _racial(key);
     final canAdd = base < 15 &&
-        _pointsRemaining >= (DndRules.pointCosts[base + 1]! - DndRules.pointCosts[base]!);
+        _pointsRemaining >=
+            (DndRules.pointCosts[base + 1]! - DndRules.pointCosts[base]!);
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
@@ -147,18 +162,24 @@ class _CreateCharacterScreenState extends State<CreateCharacterScreen> {
               children: [
                 Text(
                   '${DndRules.statNames[key]} (${key.toUpperCase()})',
-                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                  style: const TextStyle(
+                      fontWeight: FontWeight.bold, fontSize: 15),
                 ),
                 if (racial > 0)
                   Text('+$racial racial ($_race)',
-                      style: const TextStyle(color: AppColors.success, fontSize: 12)),
+                      style: const TextStyle(
+                          color: AppColors.success, fontSize: 12)),
               ],
             ),
           ),
           IconButton(
-            icon: const Icon(Icons.remove_circle_outline, color: AppColors.accent),
-            onPressed: base > 8 ? () => setState(() => _baseStats[key] = base - 1) : null,
+            icon: const Icon(Icons.remove_circle_outline,
+                color: AppColors.accent),
+            onPressed: base > 8
+                ? () => setState(() => _baseStats[key] = base - 1)
+                : null,
           ),
+          QuickHelp(topic: topicForLabel('Atributos')!),
           Container(
             width: 64,
             padding: const EdgeInsets.symmetric(vertical: 6),
@@ -171,15 +192,21 @@ class _CreateCharacterScreenState extends State<CreateCharacterScreen> {
             child: Column(
               children: [
                 Text('${_finalStat(key)}',
-                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.accent)),
+                    style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.accent)),
                 Text(_modText(DndRules.modifier(_finalStat(key))),
-                    style: const TextStyle(fontSize: 11, color: AppColors.muted)),
+                    style:
+                        const TextStyle(fontSize: 11, color: AppColors.muted)),
               ],
             ),
           ),
           IconButton(
             icon: const Icon(Icons.add_circle_outline, color: AppColors.accent),
-            onPressed: canAdd ? () => setState(() => _baseStats[key] = base + 1) : null,
+            onPressed: canAdd
+                ? () => setState(() => _baseStats[key] = base + 1)
+                : null,
           ),
         ],
       ),
@@ -188,25 +215,35 @@ class _CreateCharacterScreenState extends State<CreateCharacterScreen> {
 
   String _modText(int m) => m >= 0 ? '+$m' : '$m';
 
-  Widget _dropdown(String label, String value, List<String> items, ValueChanged<String> onChanged) {
-    return DropdownButtonFormField<String>(
-      initialValue: value,
-      isExpanded: true,
-      decoration: InputDecoration(labelText: label),
-      items: items.map((i) => DropdownMenuItem(value: i, child: Text(i))).toList(),
-      onChanged: (v) {
-        if (v != null) setState(() => onChanged(v));
-      },
+  Widget _dropdown(String label, String value, List<String> items,
+      ValueChanged<String> onChanged) {
+    return HelpField(
+      topic: topicForLabel(label),
+      child: DropdownButtonFormField<String>(
+        initialValue: value,
+        isExpanded: true,
+        decoration: InputDecoration(labelText: label),
+        items: items
+            .map((i) => DropdownMenuItem(value: i, child: Text(i)))
+            .toList(),
+        onChanged: (v) {
+          if (v != null) setState(() => onChanged(v));
+        },
+      ),
     );
   }
 
-  Widget _field(TextEditingController ctrl, String label, {int lines = 1, String? hint}) {
+  Widget _field(TextEditingController ctrl, String label,
+      {int lines = 1, String? hint}) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 14),
-      child: TextField(
-        controller: ctrl,
-        maxLines: lines,
-        decoration: InputDecoration(labelText: label, hintText: hint),
+      child: HelpField(
+        topic: topicForLabel(label),
+        child: TextField(
+          controller: ctrl,
+          maxLines: lines,
+          decoration: InputDecoration(labelText: label, hintText: hint),
+        ),
       ),
     );
   }
@@ -219,16 +256,20 @@ class _CreateCharacterScreenState extends State<CreateCharacterScreen> {
             SizedBox(
               width: 110,
               child: Text(label,
-                  style: const TextStyle(color: AppColors.accent, fontWeight: FontWeight.bold)),
+                  style: const TextStyle(
+                      color: AppColors.accent, fontWeight: FontWeight.bold)),
             ),
             Expanded(child: Text(value)),
+            if (topicForLabel(label) != null)
+              QuickHelp(topic: topicForLabel(label)!),
           ],
         ),
       );
 
   Step _step(int index, String title, Widget content) {
     return Step(
-      title: Text(title, style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold)),
+      title: Text(title,
+          style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold)),
       content: SheetCard(margin: EdgeInsets.zero, children: [content]),
       isActive: _currentStep >= index,
       state: _currentStep > index ? StepState.complete : StepState.indexed,
@@ -263,9 +304,12 @@ class _CreateCharacterScreenState extends State<CreateCharacterScreen> {
                       ? const SizedBox(
                           width: 20,
                           height: 20,
-                          child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                          child: CircularProgressIndicator(
+                              strokeWidth: 2, color: Colors.white),
                         )
-                      : Text(_currentStep == _lastStep ? 'Guardar personaje' : 'Siguiente'),
+                      : Text(_currentStep == _lastStep
+                          ? 'Guardar personaje'
+                          : 'Siguiente'),
                 ),
                 const SizedBox(width: 12),
                 if (_currentStep > 0)
@@ -285,9 +329,11 @@ class _CreateCharacterScreenState extends State<CreateCharacterScreen> {
                   _field(_nameCtrl, 'Nombre del personaje'),
                   _dropdown('Raza', _race, DndRules.races, (v) => _race = v),
                   const SizedBox(height: 14),
-                  _dropdown('Clase', _class, DndRules.classes.keys.toList(), (v) => _class = v),
+                  _dropdown('Clase', _class, DndRules.classes.keys.toList(),
+                      (v) => _class = v),
                   const SizedBox(height: 14),
-                  _dropdown('Alineamiento', _alignment, DndRules.alignments, (v) => _alignment = v),
+                  _dropdown('Alineamiento', _alignment, DndRules.alignments,
+                      (v) => _alignment = v),
                 ],
               ),
             ),
@@ -301,7 +347,9 @@ class _CreateCharacterScreenState extends State<CreateCharacterScreen> {
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
-                      color: _pointsRemaining == 0 ? AppColors.success : AppColors.accent,
+                      color: _pointsRemaining == 0
+                          ? AppColors.success
+                          : AppColors.accent,
                     ),
                   ),
                   const SizedBox(height: 6),
@@ -309,7 +357,8 @@ class _CreateCharacterScreenState extends State<CreateCharacterScreen> {
                     'Sistema de compra oficial: cada atributo va de 8 a 15. '
                     'El bonificador racial se suma automáticamente.',
                     textAlign: TextAlign.center,
-                    style: TextStyle(fontStyle: FontStyle.italic, color: AppColors.muted),
+                    style: TextStyle(
+                        fontStyle: FontStyle.italic, color: AppColors.muted),
                   ),
                   const Divider(height: 24),
                   for (final k in stats) _statRow(k),
@@ -321,7 +370,8 @@ class _CreateCharacterScreenState extends State<CreateCharacterScreen> {
               'III. Trasfondo y apariencia',
               Column(
                 children: [
-                  _field(_avatarCtrl, 'URL de imagen (avatar)', hint: 'https://...'),
+                  _field(_avatarCtrl, 'URL de imagen (avatar)',
+                      hint: 'https://...'),
                   _field(_historyCtrl, 'Historia del personaje', lines: 3),
                   _field(_idealsCtrl, 'Ideales', lines: 2),
                   _field(_bondsCtrl, 'Vínculos', lines: 2),
@@ -335,24 +385,34 @@ class _CreateCharacterScreenState extends State<CreateCharacterScreen> {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _summaryLine('Nombre', _nameCtrl.text.trim().isEmpty ? 'Sin nombre' : _nameCtrl.text.trim()),
+                  _summaryLine(
+                      'Nombre',
+                      _nameCtrl.text.trim().isEmpty
+                          ? 'Sin nombre'
+                          : _nameCtrl.text.trim()),
                   _summaryLine('Raza y clase', '$_race $_class (Nivel 1)'),
                   _summaryLine('Alineamiento', _alignment),
                   _summaryLine('Puntos de golpe', '$_maxHp'),
                   _summaryLine('Velocidad', '${DndRules.speedFor(_race)} ft'),
                   _summaryLine(
                     'Atributos',
-                    stats.map((k) => '${k.toUpperCase()} ${_finalStat(k)}').join(' · '),
+                    stats
+                        .map((k) => '${k.toUpperCase()} ${_finalStat(k)}')
+                        .join(' · '),
                   ),
                   _summaryLine(
                     'Salvaciones',
-                    (info?.saves ?? []).map((s) => DndRules.statNames[s]).join(', '),
+                    (info?.saves ?? [])
+                        .map((s) => DndRules.statNames[s])
+                        .join(', '),
                   ),
-                  _summaryLine('Equipo inicial', (info?.equipment ?? []).join(', ')),
+                  _summaryLine(
+                      'Equipo inicial', (info?.equipment ?? []).join(', ')),
                   const SizedBox(height: 10),
                   const Text(
                     'Podrás editar el inventario, conjuros y demás desde tu hoja de personaje.',
-                    style: TextStyle(color: AppColors.muted, fontStyle: FontStyle.italic),
+                    style: TextStyle(
+                        color: AppColors.muted, fontStyle: FontStyle.italic),
                   ),
                 ],
               ),

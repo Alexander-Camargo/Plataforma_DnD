@@ -8,6 +8,8 @@ import '../providers/campaign_provider.dart';
 import '../providers/character_provider.dart';
 import '../models/models.dart';
 import '../widgets/main_drawer.dart';
+import '../widgets/quick_help.dart';
+import '../core/data/tutorial_topics.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -33,7 +35,8 @@ class _HomeScreenState extends State<HomeScreen> {
     final available = charProv.availableCharacters;
     if (available.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        content: Text('No tienes personajes libres. Crea uno nuevo o termina la campaña de otro.'),
+        content: Text(
+            'No tienes personajes libres. Crea uno nuevo o termina la campaña de otro.'),
       ));
       return;
     }
@@ -84,9 +87,12 @@ class _HomeScreenState extends State<HomeScreen> {
             TextButton.icon(
               icon: const Icon(Icons.copy, size: 18),
               label: const Text('Copiar'),
-              onPressed: () => Clipboard.setData(ClipboardData(text: created.joinCode)),
+              onPressed: () =>
+                  Clipboard.setData(ClipboardData(text: created.joinCode)),
             ),
-            ElevatedButton(onPressed: () => Navigator.pop(ctx), child: const Text('Listo')),
+            ElevatedButton(
+                onPressed: () => Navigator.pop(ctx),
+                child: const Text('Listo')),
           ],
         ),
       );
@@ -100,13 +106,23 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Scaffold(
       drawer: const MainDrawer(),
-      appBar: AppBar(title: const Text('Campañas')),
+      appBar: AppBar(
+        title: const Text('Campañas'),
+        actions: [
+          IconButton(
+            tooltip: 'Guía de juego y de la aplicación',
+            icon: const Icon(Icons.help_outline),
+            onPressed: () => context.go('/campaign-tutorial'),
+          ),
+        ],
+      ),
       body: campaignProv.isLoading && campaignProv.campaigns.isEmpty
           ? const Center(child: CircularProgressIndicator())
           : campaignProv.campaigns.isEmpty
               ? const EmptyState(
                   icon: Icons.map_outlined,
-                  message: 'Aún no estás en ninguna campaña.\nÚnete con un código o crea la tuya.',
+                  message:
+                      'Aún no estás en ninguna campaña.\nÚnete con un código o crea la tuya.',
                 )
               : RefreshIndicator(
                   onRefresh: campaignProv.fetchMyCampaigns,
@@ -120,14 +136,19 @@ class _HomeScreenState extends State<HomeScreen> {
                         final isDM = c.dmId == userId;
                         return Card(
                           child: ListTile(
-                            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                            contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 16, vertical: 8),
                             leading: CircleAvatar(
-                              backgroundColor: isDM ? AppColors.accent : AppColors.bgDark,
-                              child: Icon(isDM ? Icons.shield : Icons.map, color: AppColors.gold),
+                              backgroundColor:
+                                  isDM ? AppColors.accent : AppColors.bgDark,
+                              child: Icon(isDM ? Icons.shield : Icons.map,
+                                  color: AppColors.gold),
                             ),
                             title: Text(
                               c.name,
-                              style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.accent),
+                              style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: AppColors.accent),
                             ),
                             subtitle: Text(
                               '${isDM ? "Dungeon Master" : "Jugador"} · '
@@ -135,7 +156,8 @@ class _HomeScreenState extends State<HomeScreen> {
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
                             ),
-                            trailing: const Icon(Icons.chevron_right, color: AppColors.gold),
+                            trailing: const Icon(Icons.chevron_right,
+                                color: AppColors.gold),
                             onTap: () => context.go('/campaign/${c.id}'),
                           ),
                         );
@@ -144,6 +166,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
       floatingActionButton: Column(
+        mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.end,
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
@@ -218,23 +241,31 @@ class _JoinCampaignDialogState extends State<_JoinCampaignDialog> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            TextField(
-              controller: _codeCtrl,
-              textCapitalization: TextCapitalization.characters,
-              decoration: const InputDecoration(labelText: 'Código de unión'),
+            HelpField(
+              topic: topicForLabel('Código de unión'),
+              child: TextField(
+                controller: _codeCtrl,
+                textCapitalization: TextCapitalization.characters,
+                decoration: const InputDecoration(labelText: 'Código de unión'),
+              ),
             ),
             const SizedBox(height: 16),
-            DropdownButtonFormField<Character>(
-              initialValue: _selected,
-              isExpanded: true,
-              decoration: const InputDecoration(labelText: 'Personaje a usar'),
-              items: widget.characters
-                  .map((c) => DropdownMenuItem(
-                        value: c,
-                        child: Text('${c.name} (Nv. ${c.level})', overflow: TextOverflow.ellipsis),
-                      ))
-                  .toList(),
-              onChanged: (v) => setState(() => _selected = v ?? _selected),
+            HelpField(
+              topic: topicForLabel('Personaje a usar'),
+              child: DropdownButtonFormField<Character>(
+                initialValue: _selected,
+                isExpanded: true,
+                decoration:
+                    const InputDecoration(labelText: 'Personaje a usar'),
+                items: widget.characters
+                    .map((c) => DropdownMenuItem(
+                          value: c,
+                          child: Text('${c.name} (Nv. ${c.level})',
+                              overflow: TextOverflow.ellipsis),
+                        ))
+                    .toList(),
+                onChanged: (v) => setState(() => _selected = v ?? _selected),
+              ),
             ),
             if (_error != null) ...[
               const SizedBox(height: 12),
@@ -244,8 +275,11 @@ class _JoinCampaignDialogState extends State<_JoinCampaignDialog> {
         ),
       ),
       actions: [
-        TextButton(onPressed: _busy ? null : () => Navigator.pop(context), child: const Text('Cancelar')),
-        ElevatedButton(onPressed: _busy ? null : _join, child: const Text('Unirse')),
+        TextButton(
+            onPressed: _busy ? null : () => Navigator.pop(context),
+            child: const Text('Cancelar')),
+        ElevatedButton(
+            onPressed: _busy ? null : _join, child: const Text('Unirse')),
       ],
     );
   }
@@ -303,12 +337,20 @@ class _CreateCampaignDialogState extends State<_CreateCampaignDialog> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            TextField(controller: _nameCtrl, decoration: const InputDecoration(labelText: 'Nombre')),
+            HelpField(
+              topic: topicForLabel('Nombre de la campaña'),
+              child: TextField(
+                  controller: _nameCtrl,
+                  decoration: const InputDecoration(labelText: 'Nombre')),
+            ),
             const SizedBox(height: 12),
-            TextField(
-              controller: _descCtrl,
-              maxLines: 3,
-              decoration: const InputDecoration(labelText: 'Descripción'),
+            HelpField(
+              topic: topicForLabel('Descripción de la campaña'),
+              child: TextField(
+                controller: _descCtrl,
+                maxLines: 3,
+                decoration: const InputDecoration(labelText: 'Descripción'),
+              ),
             ),
             if (_error != null) ...[
               const SizedBox(height: 12),
@@ -318,8 +360,11 @@ class _CreateCampaignDialogState extends State<_CreateCampaignDialog> {
         ),
       ),
       actions: [
-        TextButton(onPressed: _busy ? null : () => Navigator.pop(context), child: const Text('Cancelar')),
-        ElevatedButton(onPressed: _busy ? null : _create, child: const Text('Crear')),
+        TextButton(
+            onPressed: _busy ? null : () => Navigator.pop(context),
+            child: const Text('Cancelar')),
+        ElevatedButton(
+            onPressed: _busy ? null : _create, child: const Text('Crear')),
       ],
     );
   }

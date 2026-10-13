@@ -7,6 +7,7 @@ import '../../screens/character_screen.dart';
 import '../../screens/dm_dashboard_screen.dart';
 import '../../screens/create_character_screen.dart';
 import '../../screens/my_characters_screen.dart';
+import '../../screens/campaign_tutorial_screen.dart';
 
 class AppRouter {
   static GoRouter createRouter(AuthProvider authProvider) {
@@ -24,18 +25,31 @@ class AppRouter {
         return null;
       },
       routes: [
-        GoRoute(path: '/login', builder: (context, state) => const LoginScreen()),
+        GoRoute(
+            path: '/login', builder: (context, state) => const LoginScreen()),
         GoRoute(path: '/', builder: (context, state) => const HomeScreen()),
-        GoRoute(path: '/my-characters', builder: (context, state) => const MyCharactersScreen()),
-        GoRoute(path: '/dm-dashboard', builder: (context, state) => const DmDashboardScreen()),
-        GoRoute(path: '/create-character', builder: (context, state) => const CreateCharacterScreen()),
+        GoRoute(
+            path: '/campaign-tutorial',
+            builder: (context, state) => CampaignTutorialScreen(
+                section: state.uri.queryParameters['section'])),
+        GoRoute(
+            path: '/my-characters',
+            builder: (context, state) => const MyCharactersScreen()),
+        GoRoute(
+            path: '/dm-dashboard',
+            builder: (context, state) => const DmDashboardScreen()),
+        GoRoute(
+            path: '/create-character',
+            builder: (context, state) => const CreateCharacterScreen()),
         GoRoute(
           path: '/campaign/:id',
-          builder: (context, state) => CampaignScreen(campaignId: state.pathParameters['id']!),
+          builder: (context, state) =>
+              CampaignScreen(campaignId: state.pathParameters['id']!),
         ),
         GoRoute(
           path: '/character/:id',
-          builder: (context, state) => CharacterScreen(characterId: state.pathParameters['id']!),
+          builder: (context, state) =>
+              CharacterScreen(characterId: state.pathParameters['id']!),
         ),
       ],
     );
