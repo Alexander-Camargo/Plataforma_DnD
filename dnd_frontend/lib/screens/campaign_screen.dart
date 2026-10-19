@@ -1,3 +1,11 @@
+/// Archivo: campaign_screen.dart
+/// Propósito: Pantalla principal de campaña para DM y Jugadores, con gestión de Control de Personajes, Hitos, Iniciativa y Notas.
+/// Creador: Antigravity
+/// Modificaciones / Actualizaciones:
+/// - Renombrada pestaña 'Estado de Personajes' a 'Control de Personajes'.
+/// - Añadido contador y badge de experiencia (XP) por personaje, junto con diálogo de otorgar XP para el DM.
+/// - Añadida pestaña de 'Hitos' (Milestones) para definición, seguimiento y completado con otorgamiento automático de XP.
+
 import 'package:flutter/material.dart';
 import '../widgets/campaign_status_note_dialog.dart';
 import '../widgets/quick_help.dart';
@@ -24,6 +32,7 @@ class _CampaignScreenState extends State<CampaignScreen> {
   final TextEditingController _notesCtrl = TextEditingController();
 
   List<Character> _characters = [];
+  List<Milestone> _milestones = [];
   bool _isLoading = true;
   String? _error;
 
@@ -64,11 +73,21 @@ class _CampaignScreenState extends State<CampaignScreen> {
       final List<dynamic> data =
           await _api.get('/characters/?campaign_id=${widget.campaignId}');
       final chars = data.map((e) => Character.fromJson(e)).toList();
+
+      List<Milestone> milestones = [];
+      try {
+        final List<dynamic> mData =
+            await _api.get('/campaigns/${widget.campaignId}/milestones');
+        milestones = mData.map((e) => Milestone.fromJson(e)).toList();
+      } catch (_) {
+        // En caso de que no haya hitos o la ruta aún no devuelva datos
+      }
       if (!mounted) return;
 
       final campaign = _findCampaign();
       setState(() {
         _characters = chars;
+        _milestones = milestones;
         for (final c in chars) {
           _currentHp.putIfAbsent(c.id, () => _maxHp(c));
           _initiative.putIfAbsent(c.id, () => 0);
@@ -133,6 +152,257 @@ class _CampaignScreenState extends State<CampaignScreen> {
     );
   }
 
+  Future<void> _awardXpDialog(Character char) async {
+    final ctrl = TextEditingController();
+    final formKey = GlobalKey<FormState>();
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text('Otorgar XP a ${char.name}'),
+        content: Form(
+          key: formKey,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('XP actual: ${char.experience} (Nivel ${char.level})'),
+              const SizedBox(height: 12),
+              TextFormField(
+                controller: ctrl,
+                autofocus: true,
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(
+                  labelText: 'Cantidad de XP a sumar',
+                  hintText: 'Ej: 150',
+                  prefixIcon: Icon(Icons.star, color: AppColors.gold),
+                ),
+                validator: (v) {
+                  final n = int.tryParse(v?.trim() ?? '');
+                  if (n == null || n <= 0) return 'Ingresa un número mayor a 0';
+                  return null;
+                },
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Cancelar'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              if (formKey.currentState?.validate() ?? false) {
+                Navigator.pop(ctx, true);
+              }
+            },
+            child: const Text('Otorgar'),
+          ),
+        ],
+      ),
+    );
+
+    if (ok != true || !mounted) return;
+    final xpToAdd = int.parse(ctrl.text.trim());
+    try {
+      final res =
+          await _api.post('/characters/${char.id}/award-xp', {'xp': xpToAdd});
+      final updated = Character.fromJson(res);
+      if (!mounted) return;
+      setState(() {
+        _characters = [
+          for (final c in _characters) c.id == updated.id ? updated : c
+        ];
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Se otorgaron $xpToAdd XP a ${char.name}.')),
+      );
+    } on ApiException catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(e.message)));
+      }
+    }
+  }
+
+  Future<void> _createMilestoneDialog() async {
+    final titleCtrl = TextEditingController();
+    final descCtrl = TextEditingController();
+    int targetLevel = 2;
+    final formKey = GlobalKey<FormState>();
+
+    final created = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setDialogState) => AlertDialog(
+          title: const Text('Nuevo Hito de Campaña'),
+          content: SingleChildScrollView(
+            child: Form(
+              key: formKey,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  TextFormField(
+                    controller: titleCtrl,
+                    decoration: const InputDecoration(
+                      labelText: 'Título del hito (ej: Rescatar el pueblo)',
+                    ),
+                    validator: (v) => (v == null || v.trim().isEmpty)
+                        ? 'Ingresa un título'
+                        : null,
+                  ),
+                  const SizedBox(height: 12),
+                  TextFormField(
+                    controller: descCtrl,
+                    maxLines: 2,
+                    decoration: const InputDecoration(
+                      labelText: 'Descripción / Objetivo (opcional)',
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Row(
+                    children: [
+                      const Text('Nivel objetivo: ',
+                          style: TextStyle(fontWeight: FontWeight.bold)),
+                      DropdownButton<int>(
+                        value: targetLevel,
+                        items: List.generate(19, (i) => i + 2)
+                            .map((lvl) => DropdownMenuItem(
+                                value: lvl, child: Text('Nivel $lvl')))
+                            .toList(),
+                        onChanged: (lvl) {
+                          if (lvl != null) {
+                            setDialogState(() => targetLevel = lvl);
+                          }
+                        },
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'XP al completar: ${DndRules.xpForLevel(targetLevel)} XP',
+                    style: const TextStyle(
+                        color: AppColors.gold, fontWeight: FontWeight.bold),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx, false),
+              child: const Text('Cancelar'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                if (formKey.currentState?.validate() ?? false) {
+                  Navigator.pop(ctx, true);
+                }
+              },
+              child: const Text('Crear Hito'),
+            ),
+          ],
+        ),
+      ),
+    );
+
+    if (created != true || !mounted) return;
+    try {
+      await _api.post('/campaigns/${widget.campaignId}/milestones', {
+        'title': titleCtrl.text.trim(),
+        'description': descCtrl.text.trim(),
+        'target_level': targetLevel,
+        'xp_granted': DndRules.xpForLevel(targetLevel),
+      });
+      await _load();
+      if (!mounted) return;
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(content: Text('Hito creado con éxito.')));
+    } on ApiException catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(e.message)));
+      }
+    }
+  }
+
+  Future<void> _completeMilestone(Milestone m) async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('¿Completar Hito?'),
+        content: Text(
+          'Al completar "${m.title}", todos los aventureros recibirán ${m.xpGranted} XP para alcanzar el Nivel ${m.targetLevel}.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Cancelar'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('Confirmar y Otorgar XP'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm != true || !mounted) return;
+    try {
+      await _api.patch('/campaigns/${widget.campaignId}/milestones/${m.id}', {
+        'is_completed': true,
+      });
+      await _load();
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+            content: Text(
+                '¡Hito "${m.title}" completado! Se actualizó la XP de los personajes.')),
+      );
+    } on ApiException catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(e.message)));
+      }
+    }
+  }
+
+  Future<void> _deleteMilestone(Milestone m) async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('¿Eliminar Hito?'),
+        content: Text('¿Deseas eliminar el hito "${m.title}"?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Cancelar'),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: AppColors.accent),
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('Eliminar'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm != true || !mounted) return;
+    try {
+      await _api.delete('/campaigns/${widget.campaignId}/milestones/${m.id}');
+      await _load();
+      if (!mounted) return;
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(content: Text('Hito eliminado.')));
+    } on ApiException catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(e.message)));
+      }
+    }
+  }
+
   // ---------- Widgets compartidos ----------
   Color _statusColor(String status) {
     switch (status) {
@@ -184,6 +454,63 @@ class _CampaignScreenState extends State<CampaignScreen> {
       '${c.race} ${DndRules.displayClass(c.classSlug)} · Nivel ${c.level}'
       '${c.statusNote.isNotEmpty ? "\n“${c.statusNote}”" : ""}';
 
+  Widget _xpBadge(Character c, {required bool isDM}) {
+    final nextLevel = c.level + 1;
+    final needed = DndRules.xpForLevel(nextLevel);
+    return Padding(
+      padding: const EdgeInsets.only(top: 4),
+      child: Wrap(
+        crossAxisAlignment: WrapCrossAlignment.center,
+        spacing: 6,
+        runSpacing: 4,
+        children: [
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+            decoration: BoxDecoration(
+              color: AppColors.gold.withValues(alpha: 0.15),
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: AppColors.gold.withValues(alpha: 0.4)),
+            ),
+            child: Text(
+              '⭐ ${c.experience} / $needed XP (Nivel ${c.level})',
+              style: const TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.bold,
+                color: AppColors.gold,
+              ),
+            ),
+          ),
+          if (isDM)
+            InkWell(
+              onTap: () => _awardXpDialog(c),
+              borderRadius: BorderRadius.circular(4),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                decoration: BoxDecoration(
+                  color: AppColors.accent.withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: const Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.add, size: 14, color: AppColors.gold),
+                    Text(
+                      'XP',
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: AppColors.gold,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
   Widget _statusList({required bool isDM}) {
     if (_characters.isEmpty) {
       return const EmptyState(
@@ -206,18 +533,41 @@ class _CampaignScreenState extends State<CampaignScreen> {
               title: Text(c.name,
                   style: const TextStyle(
                       fontWeight: FontWeight.bold, color: AppColors.accent)),
-              subtitle: Text(_subtitle(c)),
-              isThreeLine: c.statusNote.isNotEmpty,
+              subtitle: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(_subtitle(c)),
+                  _xpBadge(c, isDM: isDM),
+                ],
+              ),
+              isThreeLine: true,
               trailing: isDM
                   ? PopupMenuButton<String>(
                       tooltip: 'Cambiar estado',
-                      onSelected: (s) => _changeStatus(c, s),
-                      itemBuilder: (_) => DndRules.statuses.entries
-                          .map((e) => PopupMenuItem(
-                                value: e.key,
-                                child: Text(e.value),
-                              ))
-                          .toList(),
+                      onSelected: (s) {
+                        if (s == 'award_xp') {
+                          _awardXpDialog(c);
+                        } else {
+                          _changeStatus(c, s);
+                        }
+                      },
+                      itemBuilder: (_) => [
+                        const PopupMenuItem(
+                          value: 'award_xp',
+                          child: Row(
+                            children: [
+                              Icon(Icons.star, color: AppColors.gold, size: 18),
+                              SizedBox(width: 8),
+                              Text('Otorgar XP'),
+                            ],
+                          ),
+                        ),
+                        const PopupMenuDivider(),
+                        ...DndRules.statuses.entries.map((e) => PopupMenuItem(
+                              value: e.key,
+                              child: Text(e.value),
+                            )),
+                      ],
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
@@ -419,22 +769,188 @@ class _CampaignScreenState extends State<CampaignScreen> {
     );
   }
 
+  Widget _milestonesTab({required bool isDM}) {
+    if (_milestones.isEmpty) {
+      return ContentWidth(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const EmptyState(
+              icon: Icons.flag_outlined,
+              message:
+                  'No se han definido hitos para esta campaña.\nLos hitos permiten avanzar de nivel y otorgar XP.',
+            ),
+            if (isDM) ...[
+              const SizedBox(height: 16),
+              ElevatedButton.icon(
+                icon: const Icon(Icons.add),
+                label: const Text('Crear Hito'),
+                onPressed: _createMilestoneDialog,
+              ),
+            ],
+          ],
+        ),
+      );
+    }
+
+    return ContentWidth(
+      child: Column(
+        children: [
+          if (isDM)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+              child: Row(
+                children: [
+                  const Expanded(
+                    child: Text(
+                      'Al completar un hito, todos los aventureros reciben la XP necesaria para subir de nivel.',
+                      style: TextStyle(
+                          color: AppColors.muted,
+                          fontStyle: FontStyle.italic,
+                          fontSize: 13),
+                    ),
+                  ),
+                  ElevatedButton.icon(
+                    icon: const Icon(Icons.add, size: 18),
+                    label: const Text('Nuevo Hito'),
+                    onPressed: _createMilestoneDialog,
+                  ),
+                ],
+              ),
+            ),
+          Expanded(
+            child: ListView.builder(
+              padding: const EdgeInsets.all(16),
+              itemCount: _milestones.length,
+              itemBuilder: (context, i) {
+                final m = _milestones[i];
+                return Card(
+                  child: ListTile(
+                    contentPadding:
+                        const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    leading: CircleAvatar(
+                      backgroundColor: m.isCompleted
+                          ? AppColors.success.withValues(alpha: 0.2)
+                          : AppColors.gold.withValues(alpha: 0.2),
+                      child: Icon(
+                        m.isCompleted ? Icons.check_circle : Icons.flag,
+                        color:
+                            m.isCompleted ? AppColors.success : AppColors.gold,
+                      ),
+                    ),
+                    title: Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            m.title,
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              decoration: m.isCompleted
+                                  ? TextDecoration.lineThrough
+                                  : null,
+                            ),
+                          ),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 8, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: AppColors.accent.withValues(alpha: 0.15),
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(
+                                color:
+                                    AppColors.accent.withValues(alpha: 0.4)),
+                          ),
+                          child: Text(
+                            'Nivel ${m.targetLevel} · ${m.xpGranted} XP',
+                            style: const TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.accent),
+                          ),
+                        ),
+                      ],
+                    ),
+                    subtitle: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        if (m.description.isNotEmpty) ...[
+                          const SizedBox(height: 4),
+                          Text(m.description),
+                        ],
+                        const SizedBox(height: 4),
+                        Text(
+                          m.isCompleted
+                              ? '✓ Hito completado'
+                              : 'Pendiente por completar',
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                            color: m.isCompleted
+                                ? AppColors.success
+                                : AppColors.muted,
+                          ),
+                        ),
+                      ],
+                    ),
+                    trailing: isDM
+                        ? Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              if (!m.isCompleted)
+                                ElevatedButton.icon(
+                                  icon: const Icon(Icons.check, size: 16),
+                                  label: const Text('Completar'),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: AppColors.success,
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 10, vertical: 6),
+                                  ),
+                                  onPressed: () => _completeMilestone(m),
+                                )
+                              else
+                                const Icon(Icons.done_all,
+                                    color: AppColors.success),
+                              IconButton(
+                                icon: const Icon(Icons.delete_outline,
+                                    color: AppColors.muted),
+                                tooltip: 'Eliminar hito',
+                                onPressed: () => _deleteMilestone(m),
+                              ),
+                            ],
+                          )
+                        : (m.isCompleted
+                            ? const Icon(Icons.check_circle,
+                                color: AppColors.success)
+                            : null),
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildDmView(Campaign campaign) {
     return DefaultTabController(
-      length: 3,
+      length: 4,
       child: Scaffold(
         appBar: AppBar(
           leading: BackButton(onPressed: () => context.go('/')),
           title: Text(campaign.name),
           actions: [
-            QuickHelp(topic: topicForLabel('Estado de Personajes')!),
+            QuickHelp(topic: topicForLabel('Control de Personajes')!),
+            QuickHelp(topic: topicForLabel('Hitos')!),
             QuickHelp(topic: topicForLabel('Iniciativa')!),
             QuickHelp(topic: topicForLabel('Notas Ocultas')!),
             IconButton(icon: const Icon(Icons.refresh), onPressed: _load),
           ],
           bottom: const TabBar(
             tabs: [
-              Tab(icon: Icon(Icons.favorite), text: 'Estado de Personajes'),
+              Tab(icon: Icon(Icons.people), text: 'Control de Personajes'),
+              Tab(icon: Icon(Icons.flag), text: 'Hitos'),
               Tab(icon: Icon(Icons.shield_moon), text: 'Iniciativa y Combate'),
               Tab(icon: Icon(Icons.menu_book), text: 'Notas Ocultas'),
             ],
@@ -447,6 +963,7 @@ class _CampaignScreenState extends State<CampaignScreen> {
               child: TabBarView(
                 children: [
                   _statusList(isDM: true),
+                  _milestonesTab(isDM: true),
                   _combatTracker(),
                   _notesTab(campaign)
                 ],
@@ -464,7 +981,7 @@ class _CampaignScreenState extends State<CampaignScreen> {
         leading: BackButton(onPressed: () => context.go('/')),
         title: Text(campaign.name),
         actions: [
-          QuickHelp(topic: topicForLabel('Estado de Personajes')!),
+          QuickHelp(topic: topicForLabel('Control de Personajes')!),
           IconButton(icon: const Icon(Icons.refresh), onPressed: _load),
         ],
       ),

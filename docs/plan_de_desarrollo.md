@@ -20,8 +20,9 @@ El desarrollo de la **Plataforma DnD** se divide en fases para asegurar entregas
 ## ⏳ Fase 3: Mecánicas D&D 5e Avanzadas (En Progreso)
 *   [x] **Migración de Catálogos a BD:** Modelado relacional y persistencia de razas, subrazas, clases, trasfondos, habilidades y reglas mecánicas en la base de datos (eliminando dependencia de JSON estáticos).
 *   [x] **Flujo de Creación Oficial 5e:** Compra de puntos (27 pts), bonificadores raciales dinámicos y validación de competencias en backend y frontend.
-*   [ ] **Subida de Nivel:** Interfaz para notificar cuando hay un nivel disponible y aplicar cambios.
-*   [ ] **Mejora de Puntuación de Características (ASI):** Lógica para aumentar atributos o escoger dotes cada ciertos niveles.
+*   [x] **Subida de Nivel:** Interfaz y motor 5e para aplicar progresión de PG (media fija o tirada + CON retroactivo), subclase y desbloqueo automático de rasgos de clase/raza.
+*   [x] **Mejora de Puntuación de Características (ASI):** Lógica para aumentar atributos (+2 o +1/+1 hasta 20) en niveles oficiales de cada clase (4, 8, 12, 16, 19; Guerrero +6/+14; Pícaro +10).
+*   [x] **Progresión por Hitos (Milestones) y Experiencia (XP):** Restricción de subida de nivel a personajes en campaña activa, cálculo y tabla oficial de experiencia (XP), concesión automática de XP por hitos de campaña completados por el DM, otorgamiento individual de XP y pestaña "Control de Personajes".
 *   [ ] Selección y asignación de Conjuros (Spellcasting) dependiendo de la clase.
 *   [ ] Manejo de Inventario Avanzado (Cálculo de peso y monedas).
 *   [ ] Equipamiento dinámico (Armas, armaduras y bonificadores automáticos a la CA o ataques).

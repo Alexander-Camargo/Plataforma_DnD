@@ -6,12 +6,14 @@ Modificaciones / Actualizaciones:
 - 2026-10-08 [Alexander Camargo]: Configuración base de FastAPI, routers y CORS.
 - 2026-10-12 [Joshua Pérez Bullen]: Cabeceras anti-caché en archivos bootstrap de Flutter web.
 - 2026-10-18 [Alexander Camargo]: Inicialización automática de tablas y siembra de catálogos en el evento lifespan.
+- 2026-10-19 [Alexander Camargo]: Garantizar columna experience en tabla characters durante lifespan.
 """
 from contextlib import asynccontextmanager
 from pathlib import Path
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
+from sqlalchemy import text
 
 from app.core.config import get_settings
 from app.api.v1.api import api_router
@@ -25,6 +27,9 @@ settings = get_settings()
 async def lifespan(app: FastAPI):
     # Setup inicial (crear tablas si no existen ya que no tenemos migraciones iniciales aún)
     Base.metadata.create_all(bind=engine)
+    if engine.dialect.name == "postgresql":
+        with engine.begin() as conn:
+            conn.execute(text("ALTER TABLE characters ADD COLUMN IF NOT EXISTS experience INTEGER DEFAULT 0;"))
     with SessionLocal() as session:
         seed_catalogs(session)
     yield

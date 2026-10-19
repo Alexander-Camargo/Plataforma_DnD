@@ -1,17 +1,18 @@
 """
 Archivo: models.py
-Propósito: Definición de modelos ORM con SQLAlchemy para usuarios, campañas, personajes, crónica de eventos de estado y tablas relacionales del catálogo D&D 5e.
+Propósito: Definición de modelos ORM con SQLAlchemy para usuarios, campañas, hitos de campaña, personajes (con experiencia), crónica de eventos de estado y tablas relacionales del catálogo D&D 5e.
 Creador: Alexander Camargo
 Modificaciones / Actualizaciones:
 - 2026-10-08 [Alexander Camargo]: Modelos base de usuarios, campañas, miembros, personajes y eventos de estado.
 - 2026-10-18 [Alexander Camargo]: Incorporación de modelos de catálogo (DndRace, DndSubrace, DndClass, DndBackground, DndSkill, DndRuleConfig).
 - 2026-10-18 [Alexander Camargo]: Optimización con lazy='selectin' en subrazas para evitar N+1 queries y soporte tipado Any para JsonType en reglas.
+- 2026-10-18 [Alexander Camargo]: Incorporación del modelo CampaignMilestone, relación de hitos en Campaign y persistencia de experiencia (XP) en Character.
 """
 import uuid
 from datetime import datetime, timezone
 from typing import Any
 
-from sqlalchemy import JSON, DateTime, ForeignKey, Integer, String, Text, Uuid
+from sqlalchemy import JSON, Boolean, DateTime, ForeignKey, Integer, String, Text, Uuid
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -53,6 +54,9 @@ class Campaign(Base):
     members: Mapped[list["CampaignMember"]] = relationship(
         back_populates="campaign", cascade="all, delete-orphan"
     )
+    milestones: Mapped[list["CampaignMilestone"]] = relationship(
+        back_populates="campaign", cascade="all, delete-orphan", order_by="CampaignMilestone.target_level"
+    )
 
 
 class CampaignMember(Base):
@@ -86,6 +90,7 @@ class Character(Base):
     subrace: Mapped[str | None] = mapped_column(String(40), nullable=True)
     class_slug: Mapped[str] = mapped_column(String(40))
     level: Mapped[int] = mapped_column(Integer, default=1)
+    experience: Mapped[int] = mapped_column(Integer, default=0)
     avatar_url: Mapped[str | None] = mapped_column(String(500), nullable=True)
     # Estado narrativo: solo lo edita el DM de la campaña
     status: Mapped[str] = mapped_column(String(30), default="alive")
@@ -99,6 +104,26 @@ class Character(Base):
 
     owner: Mapped[User] = relationship()
     campaign: Mapped[Campaign | None] = relationship()
+
+
+class CampaignMilestone(Base):
+    """Hito narrativo de campaña que desbloquea subida de nivel y otorga experiencia (XP)."""
+
+    __tablename__ = "campaign_milestones"
+
+    id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=uuid.uuid4)
+    campaign_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("campaigns.id", ondelete="CASCADE"), index=True
+    )
+    title: Mapped[str] = mapped_column(String(120), nullable=False)
+    description: Mapped[str] = mapped_column(Text, default="")
+    target_level: Mapped[int] = mapped_column(Integer, default=2)
+    xp_granted: Mapped[int] = mapped_column(Integer, default=0)
+    is_completed: Mapped[bool] = mapped_column(Boolean, default=False)
+    completed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)
+
+    campaign: Mapped[Campaign] = relationship(back_populates="milestones")
 
 
 class StatusEvent(Base):

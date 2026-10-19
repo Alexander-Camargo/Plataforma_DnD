@@ -85,6 +85,7 @@ def _format_race(race: DndRace, ability_keys: dict, skills: dict, configs: dict)
         "bonus_count": race.bonus_choices,
         "bonus_options": bonus_options,
         "bonus_amount": configs["bonus_choice_amount"],
+        "traits": race.traits or [],
         "subraces": [
             {
                 "id": sub.slug,
@@ -92,6 +93,7 @@ def _format_race(race: DndRace, ability_keys: dict, skills: dict, configs: dict)
                 "bonuses": _map_abilities(sub.ability_bonuses, ability_keys),
                 "speed": sub.speed if sub.speed is not None else race.speed,
                 "hp_per_level": sub.hp_per_level,
+                "traits": sub.traits or [],
             }
             for sub in race.subraces
         ],
@@ -120,6 +122,9 @@ def _format_class(cls: DndClass, ability_keys: dict, skills: dict, configs: dict
         "expertise_count": expertise["count"],
         "expertise_tools": expertise["tools"],
         "unarmored_abilities": [ability_keys[key] for key in unarmored],
+        "subclass_label": cls.subclass_label or "Subclase",
+        "subclass_level": cls.subclass_level or 3,
+        "features": cls.features or {},
     }
 
 

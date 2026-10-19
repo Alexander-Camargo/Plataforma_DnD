@@ -1,6 +1,18 @@
+/*
+Archivo: character_screen.dart
+Propósito: Pantalla de hoja de personaje de D&D 5e con pestañas de estadísticas, trasfondo, rasgos dinámicos, equipo, acciones, conjuros y subida de nivel.
+Creador: Alexander Camargo / Joshua Pérez Bullen
+Modificaciones / Actualizaciones:
+- 2026-10-08 [Alexander Camargo]: Creación de la pantalla de hoja de personaje con pestañas y exportación PDF.
+- 2026-10-12 [Joshua Pérez Bullen]: Ayuda contextual rápida y bonificadores de competencia/pericia.
+- 2026-10-18 [Alexander Camargo]: Integración del diálogo guiado de subida de nivel 5e (Hito 3.1) y renderizado dinámico de rasgos y subclase.
+- 2026-10-18 [Alexander Camargo]: Restricción de subida de nivel para personajes con campaña activa y experiencia requerida, visualización de badge de XP.
+*/
+
 import '../core/data/dnd_rules.dart';
 import 'package:flutter/material.dart';
 import '../widgets/quick_help.dart';
+import '../widgets/level_up_dialog.dart';
 import '../core/data/tutorial_topics.dart';
 import 'package:go_router/go_router.dart';
 import '../core/api/api_client.dart';
@@ -122,20 +134,63 @@ class _CharacterScreenState extends State<CharacterScreen> {
 
   Future<void> _levelUp() async {
     if (_character == null) return;
-    final newLevel = _character!.level + 1;
-    try {
-      await _api.patch('/characters/${_character!.id}', {
-        'sheet': _character!.sheet,
-        'version': _character!.version,
-      });
-      if (!mounted) return;
+    if (_character!.level >= 20) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content: Text('El personaje ya alcanzó el nivel máximo (20).')),
+      );
+      return;
+    }
+    if (!_character!.inCampaign) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+              'Los personajes sin una campaña activa no pueden subir de nivel.'),
+        ),
+      );
+      return;
+    }
+    final nextLevel = _character!.level + 1;
+    final requiredXp = DndRules.xpForLevel(nextLevel);
+    if (_character!.experience < requiredXp) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-            content:
-                Text('¡Felicidades! Has alcanzado el nivel $newLevel. (WIP)')),
+          content: Text(
+            'El personaje requiere $requiredXp XP para subir al nivel $nextLevel '
+            '(experiencia actual: ${_character!.experience} XP). Tu DM debe completar un hito u otorgar experiencia.',
+          ),
+        ),
+      );
+      return;
+    }
+
+    final choices = await showDialog<Map<String, dynamic>>(
+      context: context,
+      builder: (_) => LevelUpDialog(character: _character!),
+    );
+    if (choices == null || !mounted) return;
+
+    final newLevel = _character!.level + 1;
+    try {
+      final data = await _api.patch('/characters/${_character!.id}', {
+        'version': _character!.version,
+        'level': newLevel,
+        'level_up': choices,
+      });
+      if (!mounted) return;
+      setState(() {
+        _character = Character.fromJson(data);
+        _initControllers();
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+            content: Text('¡Felicidades! Has alcanzado el nivel $newLevel.')),
       );
     } catch (e) {
-      debugPrint('Error: $e');
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error al subir de nivel: $e')),
+      );
     }
   }
 
@@ -451,26 +506,51 @@ class _CharacterScreenState extends State<CharacterScreen> {
                                 style: const TextStyle(
                                     fontSize: 16, color: AppColors.border)),
                             const SizedBox(height: 4),
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 10, vertical: 4),
-                              decoration: BoxDecoration(
-                                color: c.campaignId != null
-                                    ? AppColors.accent
-                                    : AppColors.muted,
-                                borderRadius: BorderRadius.circular(12),
-                                border:
-                                    Border.all(color: AppColors.gold, width: 1),
-                              ),
-                              child: Text(
-                                c.campaignId != null
-                                    ? '⚔️ En Campaña'
-                                    : '🏕️ Descansando',
-                                style: const TextStyle(
-                                    fontWeight: FontWeight.w600,
-                                    fontSize: 12,
-                                    color: Colors.white),
-                              ),
+                            Wrap(
+                              spacing: 8,
+                              runSpacing: 4,
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 10, vertical: 4),
+                                  decoration: BoxDecoration(
+                                    color: c.campaignId != null
+                                        ? AppColors.accent
+                                        : AppColors.muted,
+                                    borderRadius: BorderRadius.circular(12),
+                                    border: Border.all(
+                                        color: AppColors.gold, width: 1),
+                                  ),
+                                  child: Text(
+                                    c.campaignId != null
+                                        ? '⚔️ En Campaña'
+                                        : '🏕️ Descansando',
+                                    style: const TextStyle(
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 12,
+                                        color: Colors.white),
+                                  ),
+                                ),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 10, vertical: 4),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.bgStat,
+                                    borderRadius: BorderRadius.circular(12),
+                                    border: Border.all(
+                                        color: AppColors.gold, width: 1),
+                                  ),
+                                  child: Text(
+                                    c.level >= 20
+                                        ? '⭐ ${c.experience} XP'
+                                        : '⭐ ${c.experience} / ${DndRules.xpForLevel(c.level + 1)} XP',
+                                    style: const TextStyle(
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 12,
+                                        color: AppColors.gold),
+                                  ),
+                                ),
+                              ],
                             ),
                           ],
                         ),
@@ -716,12 +796,12 @@ class _CharacterScreenState extends State<CharacterScreen> {
 
                     // TAB 4: Rasgos
                     SingleChildScrollView(
-                        padding: const EdgeInsets.all(20),
-                        child: _buildListCard('Rasgos de Raza y Clase', [
-                          const Text(
-                              '• Visión en la oscuridad (Racial)\n• Ataque Extra (Clase)',
-                              style: TextStyle(height: 1.5))
-                        ])),
+                      padding: const EdgeInsets.all(20),
+                      child: _buildListCard(
+                        'Rasgos de Raza y Clase',
+                        _buildFeaturesList(c),
+                      ),
+                    ),
 
                     // TAB 5: Equipo
                     SingleChildScrollView(
@@ -773,4 +853,64 @@ class _CharacterScreenState extends State<CharacterScreen> {
       ),
     );
   }
+
+  List<Widget> _buildFeaturesList(Character c) {
+    final subclass = (c.sheet['subclass'] as String? ?? '').trim();
+    final rawFeatures = (c.sheet['features'] as List<dynamic>?) ?? [];
+    final items = <Widget>[];
+
+    if (subclass.isNotEmpty) {
+      items.add(
+        Padding(
+          padding: const EdgeInsets.only(bottom: 12),
+          child: Text(
+            'Subclase activa: $subclass',
+            style: const TextStyle(
+                fontWeight: FontWeight.bold, color: AppColors.accent),
+          ),
+        ),
+      );
+    }
+
+    if (rawFeatures.isEmpty) {
+      items.add(const Text(
+        '• Visión en la oscuridad (Racial)\n• Ataque Extra (Clase)',
+        style: TextStyle(height: 1.5),
+      ));
+      return items;
+    }
+
+    for (final raw in rawFeatures) {
+      if (raw is Map) {
+        final name = raw['name']?.toString() ?? 'Rasgo';
+        final source = raw['source']?.toString() ?? '';
+        final level = raw['level'] ?? 1;
+        final desc = raw['description']?.toString() ?? '';
+        items.add(
+          Padding(
+            padding: const EdgeInsets.only(bottom: 12),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '• $name ($source - Nivel $level)',
+                  style: const TextStyle(
+                      fontWeight: FontWeight.bold, color: AppColors.accent),
+                ),
+                if (desc.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.only(left: 12, top: 2),
+                    child: Text(desc, style: const TextStyle(height: 1.4)),
+                  ),
+              ],
+            ),
+          ),
+        );
+      } else {
+        items.add(Text('• $raw', style: const TextStyle(height: 1.5)));
+      }
+    }
+    return items;
+  }
 }
+

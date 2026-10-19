@@ -1,11 +1,30 @@
+"""
+Archivo: campaigns.py
+Propósito: Endpoints para gestión de campañas (creación, unirse con personaje, consulta, notas del DM y gestión de hitos/milestones para subida de nivel).
+Creador: Alexander Camargo
+Modificaciones / Actualizaciones:
+- 2026-10-08 [Alexander Camargo]: Endpoints CRUD base para campañas y miembros.
+- 2026-10-18 [Alexander Camargo]: Endpoints de Hitos de campaña (Milestones) con adjudicación automática de experiencia (XP) a los personajes al completarse.
+"""
 import uuid
+from datetime import datetime, timezone
+from typing import List
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from app.api.deps import get_db, get_current_user
-from app.schemas.api_models import CampaignCreate, CampaignOut, CampaignJoin, CampaignUpdate
-from app.db.models import User, Campaign, CampaignMember, Character
+from app.schemas.api_models import (
+    CampaignCreate,
+    CampaignJoin,
+    CampaignOut,
+    CampaignUpdate,
+    MilestoneCreate,
+    MilestoneOut,
+    MilestoneUpdate,
+)
+from app.db.models import Campaign, CampaignMember, CampaignMilestone, Character, User
+from app.domain.rules import xp_for_level
 from app.services.auth_service import generate_join_code
 
 router = APIRouter()
@@ -147,3 +166,112 @@ def update_campaign(
     db.commit()
     db.refresh(campaign)
     return _serialize(campaign, current_user)
+
+
+# --- Hitos de Campaña (Milestones) ---
+
+@router.get("/{campaign_id}/milestones", response_model=List[MilestoneOut])
+def list_campaign_milestones(
+    campaign_id: uuid.UUID,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """Lista todos los hitos de una campaña (visible para todos sus miembros)."""
+    campaign = _get_member_campaign(db, campaign_id, current_user)
+    return db.query(CampaignMilestone).filter_by(
+        campaign_id=campaign.id
+    ).order_by(CampaignMilestone.target_level, CampaignMilestone.created_at).all()
+
+
+@router.post("/{campaign_id}/milestones", response_model=MilestoneOut, status_code=201)
+def create_campaign_milestone(
+    campaign_id: uuid.UUID,
+    milestone_in: MilestoneCreate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """El DM crea un nuevo hito narrativo para la campaña."""
+    campaign = db.query(Campaign).filter(Campaign.id == campaign_id).first()
+    if not campaign:
+        raise HTTPException(status_code=404, detail="Campaña no encontrada")
+    if campaign.dm_id != current_user.id:
+        raise HTTPException(status_code=403, detail="Solo el DM puede crear hitos")
+
+    milestone = CampaignMilestone(
+        campaign_id=campaign.id,
+        title=milestone_in.title.strip(),
+        description=milestone_in.description or "",
+        target_level=milestone_in.target_level,
+        xp_granted=xp_for_level(milestone_in.target_level),
+        is_completed=False,
+    )
+    db.add(milestone)
+    db.commit()
+    db.refresh(milestone)
+    return milestone
+
+
+@router.patch("/{campaign_id}/milestones/{milestone_id}", response_model=MilestoneOut)
+def update_campaign_milestone(
+    campaign_id: uuid.UUID,
+    milestone_id: uuid.UUID,
+    milestone_in: MilestoneUpdate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """El DM actualiza o completa un hito (otorgando la XP requerida a todos los personajes activos)."""
+    campaign = db.query(Campaign).filter(Campaign.id == campaign_id).first()
+    if not campaign or campaign.dm_id != current_user.id:
+        raise HTTPException(status_code=403, detail="Solo el DM puede modificar hitos")
+
+    milestone = db.query(CampaignMilestone).filter_by(
+        id=milestone_id, campaign_id=campaign_id
+    ).first()
+    if not milestone:
+        raise HTTPException(status_code=404, detail="Hito no encontrado")
+
+    if milestone_in.title is not None:
+        milestone.title = milestone_in.title.strip()
+    if milestone_in.description is not None:
+        milestone.description = milestone_in.description
+    if milestone_in.target_level is not None:
+        milestone.target_level = milestone_in.target_level
+        milestone.xp_granted = xp_for_level(milestone_in.target_level)
+
+    # Si se marca como completado y no lo estaba, adjudica XP a todos los personajes de la campaña
+    if milestone_in.is_completed is True and not milestone.is_completed:
+        milestone.is_completed = True
+        milestone.completed_at = datetime.now(timezone.utc)
+        target_xp = xp_for_level(milestone.target_level)
+        chars = db.query(Character).filter(Character.campaign_id == campaign.id).all()
+        for char in chars:
+            if char.experience < target_xp:
+                char.experience = target_xp
+                char.version += 1
+
+    db.commit()
+    db.refresh(milestone)
+    return milestone
+
+
+@router.delete("/{campaign_id}/milestones/{milestone_id}", status_code=204)
+def delete_campaign_milestone(
+    campaign_id: uuid.UUID,
+    milestone_id: uuid.UUID,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """El DM elimina un hito de la campaña."""
+    campaign = db.query(Campaign).filter(Campaign.id == campaign_id).first()
+    if not campaign or campaign.dm_id != current_user.id:
+        raise HTTPException(status_code=403, detail="Solo el DM puede eliminar hitos")
+
+    milestone = db.query(CampaignMilestone).filter_by(
+        id=milestone_id, campaign_id=campaign_id
+    ).first()
+    if not milestone:
+        raise HTTPException(status_code=404, detail="Hito no encontrado")
+
+    db.delete(milestone)
+    db.commit()
+

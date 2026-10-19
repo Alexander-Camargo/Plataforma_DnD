@@ -1,3 +1,13 @@
+/*
+Archivo: models.dart
+Propósito: Modelos de datos para el frontend (User, Campaign, Character con experiencia y Milestone/Hitos de campaña).
+Creador: Alexander Camargo / Joshua Pérez Bullen
+Modificaciones / Actualizaciones:
+- 2026-10-08 [Alexander Camargo]: Modelos User, Campaign y Character base.
+- 2026-10-12 [Joshua Pérez Bullen]: Cálculo de bonos de salvación, habilidades y pericia en Character.
+- 2026-10-18 [Alexander Camargo]: Inclusión del campo experience (XP) en Character y modelo Milestone para hitos de campaña.
+*/
+
 import '../core/data/dnd_rules.dart';
 
 class User {
@@ -43,6 +53,46 @@ class Campaign {
   }
 }
 
+class Milestone {
+  final String id;
+  final String campaignId;
+  final String title;
+  final String description;
+  final int targetLevel;
+  final int xpGranted;
+  final bool isCompleted;
+  final DateTime? completedAt;
+  final DateTime createdAt;
+
+  Milestone({
+    required this.id,
+    required this.campaignId,
+    required this.title,
+    required this.description,
+    required this.targetLevel,
+    required this.xpGranted,
+    required this.isCompleted,
+    this.completedAt,
+    required this.createdAt,
+  });
+
+  factory Milestone.fromJson(Map<String, dynamic> json) {
+    return Milestone(
+      id: json['id'],
+      campaignId: json['campaign_id'],
+      title: json['title'],
+      description: json['description'] ?? '',
+      targetLevel: json['target_level'] ?? 2,
+      xpGranted: json['xp_granted'] ?? 0,
+      isCompleted: json['is_completed'] ?? false,
+      completedAt: json['completed_at'] != null
+          ? DateTime.parse(json['completed_at'])
+          : null,
+      createdAt: DateTime.parse(json['created_at']),
+    );
+  }
+}
+
 class Character {
   final String id;
   final String? ownerId;
@@ -51,6 +101,7 @@ class Character {
   final String race;
   final String classSlug;
   final int level;
+  final int experience;
   final String? avatarUrl;
   final String status;
   final String statusNote;
@@ -65,6 +116,7 @@ class Character {
     required this.race,
     required this.classSlug,
     required this.level,
+    this.experience = 0,
     this.avatarUrl,
     required this.status,
     required this.statusNote,
@@ -115,6 +167,7 @@ class Character {
       race: json['race'],
       classSlug: json['class_slug'],
       level: json['level'] ?? 1,
+      experience: (json['experience'] as num?)?.toInt() ?? 0,
       avatarUrl: json['avatar_url'],
       status: json['status'] ?? 'alive',
       statusNote: json['status_note'] ?? '',
@@ -123,3 +176,4 @@ class Character {
     );
   }
 }
+

@@ -1,3 +1,11 @@
+"""
+Archivo: test_characters_api.py
+Propósito: Pruebas de integración para los endpoints de personajes (propiedad, permisos de campaña, bloqueo optimista, subida de nivel 5e, estados del DM y eliminación).
+Creador: Joshua Pérez Bullen / Alexander Camargo
+Modificaciones / Actualizaciones:
+- 2026-10-12 [Joshua Pérez Bullen]: Pruebas de permisos, bloqueo optimista, validación de estadísticas y eventos de estado del DM.
+- 2026-10-18 [Alexander Camargo]: Pruebas de integración para subida de nivel 5e (PG, subclase, ASI y desbloqueo de rasgos).
+"""
 import uuid
 import pytest
 from sqlalchemy import select
@@ -48,13 +56,96 @@ def test_update_increments_version_and_rejects_stale_write(client, world):
     assert client.get(url, headers=world["player"]["headers"]).json()["name"] == "Lina nueva"
 
 
-@pytest.mark.parametrize("level,status", [(2,200),(1,200),(3,400),(0,422),(21,422)])
+def test_character_without_campaign_cannot_level_up(client, world):
+    url = PREFIX + "/" + world["character"]["id"]
+    response = client.patch(url, headers=world["player"]["headers"], json={"version": 1, "level": 2})
+    assert response.status_code == 400
+    assert "campaña activa" in response.json()["detail"]
+
+
+@pytest.mark.parametrize("level,status", [(1,200),(3,400),(0,422),(21,422)])
 def test_level_update_validation(client, world, level, status):
     response = client.patch(PREFIX + "/" + world["character"]["id"],
                             headers=world["player"]["headers"], json={"version": 1, "level": level})
     assert response.status_code == status
     if status == 200:
         assert response.json()["level"] == level
+
+
+def test_level_up_progression_with_milestones_xp_and_features(client, joined_world):
+    world = joined_world
+    char = world["character"]
+    url = PREFIX + "/" + char["id"]
+    p_headers = world["player"]["headers"]
+    m_headers = world["master"]["headers"]
+    c_id = world["campaign"]["id"]
+
+    # 1. Sin XP suficiente (0 XP), no puede subir a nivel 2
+    r_bad = client.patch(url, headers=p_headers, json={"version": char["version"], "level": 2})
+    assert r_bad.status_code == 400
+    assert "requiere 300 XP" in r_bad.json()["detail"]
+
+    # 2. El DM crea un Hito para nivel 2 y lo marca completado
+    m_res = client.post(f"/api/v1/campaigns/{c_id}/milestones", headers=m_headers, json={
+        "title": "Derrotar a los bandidos de la cueva",
+        "target_level": 2
+    })
+    assert m_res.status_code == 201
+    milestone = m_res.json()
+    assert milestone["target_level"] == 2
+    assert milestone["xp_granted"] == 300
+
+    # Completar hito -> otorga automáticamente 300 XP a los personajes de la campaña
+    c_res = client.patch(f"/api/v1/campaigns/{c_id}/milestones/{milestone['id']}", headers=m_headers, json={
+        "is_completed": True
+    })
+    assert c_res.status_code == 200
+    assert c_res.json()["is_completed"] is True
+
+    # Verificar que el personaje recibió 300 XP
+    updated_char = client.get(url, headers=p_headers).json()
+    assert updated_char["experience"] == 300
+
+    # 3. Ahora sí puede subir a Nivel 2 con tirada manual de 8
+    r2 = client.patch(url, headers=p_headers, json={
+        "version": updated_char["version"], "level": 2, "level_up": {"hp_roll": 8}
+    })
+    assert r2.status_code == 200
+    c2 = r2.json()
+    assert c2["level"] == 2
+    assert c2["sheet"]["hp"] == 22
+    assert any(f["name"] == "Acción súbita" for f in c2["sheet"]["features"])
+
+    # 4. El DM otorga XP directamente para llegar a nivel 3 (requiere 900 XP; tiene 300 -> sumamos 600)
+    award_res = client.post(f"{url}/award-xp", headers=m_headers, json={"xp": 600})
+    assert award_res.status_code == 200
+    assert award_res.json()["experience"] == 900
+
+    # 5. Nivel 2 -> 3 con elección de Arquetipo Marcial y media fija (6 + 2 = +8 -> 30 PG)
+    r3 = client.patch(url, headers=p_headers, json={
+        "version": award_res.json()["version"], "level": 3, "level_up": {"subclass": "Maestro de Batalla"}
+    })
+    assert r3.status_code == 200
+    c3 = r3.json()
+    assert c3["level"] == 3
+    assert c3["sheet"]["hp"] == 30
+    assert c3["sheet"]["subclass"] == "Maestro de Batalla"
+
+    # 6. Sumar XP para nivel 4 (requiere 2700 XP; tiene 900 -> sumamos 1800)
+    c4_xp = client.post(f"{url}/award-xp", headers=m_headers, json={"xp": 1800}).json()
+    assert c4_xp["experience"] == 2700
+
+    # Nivel 3 -> 4 con ASI (+2 FUE -> 16) y media fija (+8 -> 38 PG)
+    r4 = client.patch(url, headers=p_headers, json={
+        "version": c4_xp["version"], "level": 4, "level_up": {"asi": {"fue": 2}}
+    })
+    assert r4.status_code == 200
+    c4 = r4.json()
+    assert c4["level"] == 4
+    assert c4["sheet"]["stats"]["fue"] == 16
+    assert c4["sheet"]["save_bonuses"]["fue"] == 5
+    assert c4["sheet"]["hp"] == 38
+
 
 
 @pytest.mark.parametrize("score", [0,21,1.5,"14",True])
@@ -146,4 +237,5 @@ def test_missing_character(client, actors, method):
 @pytest.mark.parametrize("path", ["/api/v1/characters/me", "/api/v1/campaigns/"])
 def test_protected_routes_require_auth(client, path):
     assert client.get(path).status_code == 401
+
 

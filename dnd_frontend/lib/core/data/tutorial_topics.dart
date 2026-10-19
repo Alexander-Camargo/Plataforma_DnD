@@ -1,3 +1,12 @@
+/*
+Archivo: tutorial_topics.dart
+Propósito: Catálogo de temas de ayuda y guía educativa integrada de D&D 5e (2014) y uso de la plataforma.
+Creador: Alexander Camargo / Joshua Pérez Bullen
+Modificaciones / Actualizaciones:
+- 2026-10-12 [Joshua Pérez Bullen]: Guía base de temas de creación, combate y atributos.
+- 2026-10-18 [Alexander Camargo]: Incorporación del tema de Hitos y Experiencia (XP) y mapeo para Control de Personajes e Hitos.
+*/
+
 class TutorialTopic {
   final String id, title, summary, detail;
   const TutorialTopic(this.id, this.title, this.summary, this.detail);
@@ -260,6 +269,11 @@ const tutorialTopics = <TutorialTopic>[
       'Herramientas de ladrón',
       'Utensilios para trabajar con cerraduras y trampas; su competencia es distinta de Juego de manos.',
       'Qué son estas herramientas\nSon un conjunto de utensilios para tareas propias de cerraduras y trampas. Son herramientas, no una de las 18 habilidades. Disponer del objeto, ser competente con él y tener pericia son cosas distintas.\n\nUna escena de ejemplo\nEncuentras un cofre cerrado. Dices que examinas el cierre y explicas cómo intentarías abrirlo con tus herramientas. El DM decide si puedes intentarlo, qué característica corresponde y qué condiciones exige la cerradura. No se abre automáticamente por estar en el inventario.\n\nCómo se calcula una prueba\nSi la prueba utiliza DES, con DES 14 tienes +2. Cuando tu competencia con las herramientas sea aplicable en nivel 1, añades +2: total +4. Con pericia aplicable, la competencia se duplica y da +6. La característica y los requisitos dependen de la tarea y sus reglas.\n\nDiferencia con otras habilidades\nJuego de manos describe gestos discretos con las manos; Investigación puede ayudar a estudiar un mecanismo. Ninguna reemplaza por sí sola todas las tareas de estas herramientas. Describe los pasos de tu intento en lugar de elegir simplemente el mayor bonificador.\n\nEn la aplicación\nEl pícaro puede escoger herramientas de ladrón como una de sus opciones de pericia de nivel 1. Debes completar el equipo con el DM y anotar que llevas las herramientas; seleccionar pericia no añade el objeto al inventario.'),
+  TutorialTopic(
+      'milestones',
+      'Hitos y Experiencia (XP)',
+      'El progreso de los aventureros se gestiona mediante hitos narrativos o experiencia dentro de una campaña activa.',
+      'Progresión en Campaña\nEn D&D 5e la subida de nivel de un aventurero refleja sus vivencias y logros compartidos. En esta plataforma, un personaje no puede subir de nivel si no forma parte de una campaña activa.\n\nHitos de Campaña (Milestones)\nEl DM define objetivos o hitos narrativos importantes para la historia (como limpiar una mazmorra o derrotar al líder enemigo). Cuando el grupo cumple el objetivo, el DM marca el hito como completado y el sistema otorga a todos los personajes la cantidad exacta de experiencia requerida para alcanzar el nivel objetivo (por ejemplo, 300 XP para Nivel 2, 900 XP para Nivel 3, etc.).\n\nContador de Experiencia y Concesión de XP\nLa experiencia ganada se guarda en la ficha del personaje y se preserva entre campañas. El DM puede también otorgar experiencia manualmente a cada personaje desde el Control de Personajes para reflejar desafíos adicionales o recompensas individuales.\n\nMomento de Subir de Nivel\nUna vez que el personaje reúne la experiencia requerida gracias a los hitos o la asignación del DM, el jugador puede abrir su hoja y confirmar la subida de nivel mediante el asistente guiado.'),
 ];
 TutorialTopic? topicForLabel(String label) {
   final key = label.toLowerCase();
@@ -308,7 +322,8 @@ TutorialTopic? topicForLabel(String label) {
     'conjuros' || 'trucos' || 'conjuros y magia' => 'spells',
     'rasgos' || 'nivel' || 'rasgos de raza y clase' => 'class',
     'historia' || 'descripción física' => 'background',
-    'estado de personajes' => 'status',
+    'estado de personajes' || 'control de personajes' => 'status',
+    'hitos' || 'hitos de campaña' => 'milestones',
     'notas ocultas' => 'notes',
     'fue' || 'fuerza' => 'strength',
     'des' || 'destreza' => 'dexterity',

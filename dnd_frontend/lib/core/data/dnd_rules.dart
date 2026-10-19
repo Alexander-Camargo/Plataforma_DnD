@@ -1,7 +1,27 @@
+/*
+Archivo: dnd_rules.dart
+Propósito: Constantes y funciones puras de reglas D&D 5e en el cliente (modificadores, competencia, dados de golpe, niveles de ASI, subclase y compra por puntos).
+Creador: Joshua Pérez Bullen / Alexander Camargo
+Modificaciones / Actualizaciones:
+- 2026-10-12 [Joshua Pérez Bullen]: Reglas base de características, habilidades, clases, ASI y compra por puntos.
+- 2026-10-18 [Alexander Camargo]: Normalización de slugs sin tildes y metadatos de nivel/etiqueta de subclase para Hito 3.1.
+- 2026-10-18 [Alexander Camargo]: Inclusión de tabla oficial de experiencia 5e (xpThresholds) y función xpForLevel.
+*/
+
 /// Reglas de D&D 5e usadas por la creación y la subida de nivel.
 /// Las claves de clase/raza son los nombres tal como se muestran en la UI.
 class DndRules {
   static String formatModifier(int value) => value >= 0 ? "+$value" : "$value";
+
+  static String _norm(String input) => input
+      .toLowerCase()
+      .trim()
+      .replaceAll('á', 'a')
+      .replaceAll('é', 'e')
+      .replaceAll('í', 'i')
+      .replaceAll('ó', 'o')
+      .replaceAll('ú', 'u');
+
   static const List<String> races = [
     'Humano',
     'Elfo',
@@ -74,54 +94,107 @@ class DndRules {
 
   static int speedFor(String race) => slowRaces.contains(race) ? 25 : 30;
 
-  /// Dado de golpe, salvaciones competentes y equipo inicial por clase.
+  /// Dado de golpe, salvaciones competentes, equipo inicial y subclase por clase.
   static const Map<String, ClassInfo> classes = {
-    'Bárbaro': ClassInfo(12, ['fue', 'con'],
-        ['Gran Hacha', 'Jabalina x4', 'Paquete de explorador']),
+    'Bárbaro': ClassInfo(
+      12,
+      ['fue', 'con'],
+      ['Gran Hacha', 'Jabalina x4', 'Paquete de explorador'],
+      subclassLevel: 3,
+      subclassLabel: 'Senda primaria',
+    ),
     'Bardo': ClassInfo(
-        8, ['des', 'car'], ['Armadura de Cuero', 'Laúd', 'Estoque', 'Daga']),
+      8,
+      ['des', 'car'],
+      ['Armadura de Cuero', 'Laúd', 'Estoque', 'Daga'],
+      subclassLevel: 3,
+      subclassLabel: 'Colegio bárdico',
+    ),
     'Brujo': ClassInfo(
-        8, ['sab', 'car'], ['Armadura de Cuero', 'Arma Simple', 'Foco Arcano']),
-    'Clérigo': ClassInfo(8, ['sab', 'car'],
-        ['Maza', 'Cota de Escamas', 'Símbolo Sagrado', 'Escudo']),
-    'Druida': ClassInfo(8, ['int', 'sab'],
-        ['Escudo de Madera', 'Cimitarra', 'Armadura de Cuero']),
-    'Explorador': ClassInfo(10, ['fue', 'des'],
-        ['Armadura de Escamas', 'Dos Espadas Cortas', 'Arco Largo']),
-    'Guerrero': ClassInfo(10, ['fue', 'con'],
-        ['Cota de Mallas', 'Espada Larga', 'Escudo', 'Ballesta Ligera']),
+      8,
+      ['sab', 'car'],
+      ['Armadura de Cuero', 'Arma Simple', 'Foco Arcano'],
+      subclassLevel: 1,
+      subclassLabel: 'Patrón de otro mundo',
+    ),
+    'Clérigo': ClassInfo(
+      8,
+      ['sab', 'car'],
+      ['Maza', 'Cota de Escamas', 'Símbolo Sagrado', 'Escudo'],
+      subclassLevel: 1,
+      subclassLabel: 'Dominio divino',
+    ),
+    'Druida': ClassInfo(
+      8,
+      ['int', 'sab'],
+      ['Escudo de Madera', 'Cimitarra', 'Armadura de Cuero'],
+      subclassLevel: 2,
+      subclassLabel: 'Círculo druídico',
+    ),
+    'Explorador': ClassInfo(
+      10,
+      ['fue', 'des'],
+      ['Armadura de Escamas', 'Dos Espadas Cortas', 'Arco Largo'],
+      subclassLevel: 3,
+      subclassLabel: 'Arquetipo de explorador',
+    ),
+    'Guerrero': ClassInfo(
+      10,
+      ['fue', 'con'],
+      ['Cota de Mallas', 'Espada Larga', 'Escudo', 'Ballesta Ligera'],
+      subclassLevel: 3,
+      subclassLabel: 'Arquetipo marcial',
+    ),
     'Hechicero': ClassInfo(
-        6, ['con', 'car'], ['Ballesta Ligera', 'Foco Arcano', 'Dagas x2']),
-    'Mago': ClassInfo(6, ['int', 'sab'],
-        ['Bastón', 'Libro de Conjuros', 'Foco Arcano', 'Túnica']),
-    'Monje': ClassInfo(8, ['fue', 'des'],
-        ['Espada Corta', 'Paquete de Explorador', 'Dardos x10']),
-    'Paladín': ClassInfo(10, ['sab', 'car'],
-        ['Espada Larga', 'Escudo', 'Cota de Mallas', 'Símbolo Sagrado']),
-    'Pícaro': ClassInfo(8, [
-      'des',
-      'int'
-    ], [
-      'Estoque',
-      'Arco Corto',
-      'Armadura de Cuero',
-      'Herramientas de Ladrón'
-    ]),
+      6,
+      ['con', 'car'],
+      ['Ballesta Ligera', 'Foco Arcano', 'Dagas x2'],
+      subclassLevel: 1,
+      subclassLabel: 'Origen de hechicería',
+    ),
+    'Mago': ClassInfo(
+      6,
+      ['int', 'sab'],
+      ['Bastón', 'Libro de Conjuros', 'Foco Arcano', 'Túnica'],
+      subclassLevel: 2,
+      subclassLabel: 'Tradición arcana',
+    ),
+    'Monje': ClassInfo(
+      8,
+      ['fue', 'des'],
+      ['Espada Corta', 'Paquete de Explorador', 'Dardos x10'],
+      subclassLevel: 3,
+      subclassLabel: 'Tradición monástica',
+    ),
+    'Paladín': ClassInfo(
+      10,
+      ['sab', 'car'],
+      ['Espada Larga', 'Escudo', 'Cota de Mallas', 'Símbolo Sagrado'],
+      subclassLevel: 3,
+      subclassLabel: 'Juramento sagrado',
+    ),
+    'Pícaro': ClassInfo(
+      8,
+      ['des', 'int'],
+      ['Estoque', 'Arco Corto', 'Armadura de Cuero', 'Herramientas de Ladrón'],
+      subclassLevel: 3,
+      subclassLabel: 'Arquetipo de pícaro',
+    ),
   };
 
-  /// Busca la clase por nombre sin importar mayúsculas (el backend guarda el slug en minúsculas).
+  /// Busca la clase por nombre sin importar mayúsculas ni tildes.
   static ClassInfo? classInfo(String name) {
-    final key = name.toLowerCase();
+    final key = _norm(name);
     for (final e in classes.entries) {
-      if (e.key.toLowerCase() == key) return e.value;
+      if (_norm(e.key) == key) return e.value;
     }
     return null;
   }
 
   static String displayClass(String slug) {
-    final key = slug.toLowerCase();
+    final key = _norm(slug);
     for (final name in classes.keys) {
-      if (name.toLowerCase() == key) return name;
+      if (_norm(name) == key) return name;
     }
     return slug;
   }
@@ -134,10 +207,10 @@ class DndRules {
   /// Niveles con Mejora de Característica (ASI).
   static bool hasAsi(String classSlug, int level) {
     const base = {4, 8, 12, 16, 19};
-    final c = classSlug.toLowerCase();
+    final c = _norm(classSlug);
     if (base.contains(level)) return true;
     if (c == 'guerrero' && (level == 6 || level == 14)) return true;
-    if (c == 'pícaro' && level == 10) return true;
+    if (c == 'picaro' && level == 10) return true;
     return false;
   }
 
@@ -161,6 +234,33 @@ class DndRules {
   };
   static const int pointBudget = 27;
 
+  // ---- Tabla Oficial de Experiencia (D&D 5e) ----
+  static const Map<int, int> xpThresholds = {
+    1: 0,
+    2: 300,
+    3: 900,
+    4: 2700,
+    5: 6500,
+    6: 14000,
+    7: 23000,
+    8: 34000,
+    9: 48000,
+    10: 64000,
+    11: 85000,
+    12: 100000,
+    13: 120000,
+    14: 140000,
+    15: 165000,
+    16: 195000,
+    17: 225000,
+    18: 265000,
+    19: 305000,
+    20: 355000,
+  };
+
+  static int xpForLevel(int level) =>
+      xpThresholds[level.clamp(1, 20)] ?? 355000;
+
   /// Estados que asigna el DM (clave API -> etiqueta).
   static const Map<String, String> statuses = {
     'alive': 'Vivo',
@@ -176,7 +276,15 @@ class ClassInfo {
   final int hitDie;
   final List<String> saves;
   final List<String> equipment;
-  const ClassInfo(this.hitDie, this.saves, this.equipment);
+  final int subclassLevel;
+  final String subclassLabel;
+  const ClassInfo(
+    this.hitDie,
+    this.saves,
+    this.equipment, {
+    this.subclassLevel = 3,
+    this.subclassLabel = 'Subclase',
+  });
 }
 
 class SkillInfo {
@@ -184,3 +292,4 @@ class SkillInfo {
   final String attribute;
   const SkillInfo(this.name, this.attribute);
 }
+

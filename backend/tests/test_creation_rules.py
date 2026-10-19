@@ -1,6 +1,14 @@
+"""
+Archivo: test_creation_rules.py
+Propósito: Pruebas unitarias del motor de reglas de D&D 5e (creación de personaje, habilidades, defensas, subida de nivel, ASI y rasgos).
+Creador: Joshua Pérez Bullen / Alexander Camargo
+Modificaciones / Actualizaciones:
+- 2026-10-12 [Joshua Pérez Bullen]: Pruebas unitarias de creación nivel 1, compra por puntos, competencias y CA sin armadura.
+- 2026-10-18 [Alexander Camargo]: Pruebas de Hito 3.1 (apply_level_up, ASI, PG fijos/tirados, PG retroactivos por CON, Enano de las Colinas y rasgos por nivel).
+"""
 import copy
 import pytest
-from app.domain.rules import calculate_creation, calculate_check_bonus, refresh_derived_checks
+from app.domain.rules import apply_level_up, calculate_creation, calculate_check_bonus, refresh_derived_checks
 from app.services.rules_catalog import creation_catalog, find_option
 
 
@@ -162,3 +170,72 @@ def test_background_must_be_an_object():
     catalog,race,cls,sub,choices = selection()
     with pytest.raises(ValueError):
         calculate_creation(catalog,race,cls,sub,choices,{'background':[]})
+
+
+def test_level_up_average_and_rolled_hp_and_hill_dwarf_bonus():
+    catalog, race, cls, sub, choices = selection("dwarf", "fighter", "hill_dwarf")
+    sheet = calculate_creation(catalog, race, cls, sub, choices, {})
+    assert sheet["hp"] == 13  # d10 (10) + CON 15 (+2) + Hill Dwarf (+1)
+    assert any(item["name"] == "Dureza enana" for item in sheet["features"])
+
+    # Nivel 2 con media fija: d10 -> 6 + CON (+2) + Hill Dwarf (+1) = +9 PG -> 22
+    lvl2 = apply_level_up(catalog, race, cls, sub, 1, sheet, {})
+    assert lvl2["hp"] == 22
+    assert any(item["name"] == "Acción súbita" for item in lvl2["features"])
+
+    # Nivel 2 con tirada manual de 10: 10 + CON (+2) + Hill Dwarf (+1) = +13 PG -> 26
+    lvl2_rolled = apply_level_up(catalog, race, cls, sub, 1, sheet, {"hp_roll": 10})
+    assert lvl2_rolled["hp"] == 26
+
+    # Tirada fuera del rango del dado de golpe (d10) debe fallar
+    for invalid_roll in (0, 11):
+        with pytest.raises(ValueError):
+            apply_level_up(catalog, race, cls, sub, 1, sheet, {"hp_roll": invalid_roll})
+
+
+def test_level_up_asi_validation_and_retroactive_constitution_hp():
+    catalog, race, cls, sub, choices = selection("human", "fighter")
+    # Humano con CON base 14 -> CON 15 (+2). Al subir CON +1 en nivel 4 pasa a 16 (+3).
+    choices["base_stats"] = {"fue": 14, "des": 12, "con": 14, "int": 10, "sab": 10, "car": 8}
+    sheet = calculate_creation(catalog, race, cls, sub, choices, {})
+    assert sheet["hp"] == 12  # 10 + 2
+
+    sheet = apply_level_up(catalog, race, cls, sub, 1, sheet)  # lvl 2: +8 -> 20
+    sheet = apply_level_up(catalog, race, cls, sub, 2, sheet, {"subclass": "Campeón"})  # lvl 3: +8 -> 28
+    assert sheet["subclass"] == "Campeón"
+
+    # Nivel 3 no permite ASI (al pasar de 2 a 3)
+    with pytest.raises(ValueError):
+        apply_level_up(catalog, race, cls, sub, 1, sheet, {"asi": {"fue": 2}})
+
+    # Nivel 4 (con ASI +1 FUE, +1 CON): CON sube de 15 (+2) a 16 (+3)
+    # Ganancia nivel 4: media d10 (6) + nuevo mod CON (+3) = 9, más +3 retroactivos por niveles 1..3 = +12 -> 40 PG
+    lvl4 = apply_level_up(catalog, race, cls, sub, 3, sheet, {"asi": {"fue": 1, "con": 1}})
+    assert lvl4["stats"]["fue"] == 16
+    assert lvl4["stats"]["con"] == 16
+    assert lvl4["hp"] == 40
+
+    # Validaciones de ASI inválido (suma != 2 o supera tope de 20)
+    for bad_asi in ({"fue": 3}, {"fue": 1}, {"fue": 1, "des": 2}):
+        with pytest.raises(ValueError):
+            apply_level_up(catalog, race, cls, sub, 3, sheet, {"asi": bad_asi})
+
+    sheet_near_cap = copy.deepcopy(sheet)
+    sheet_near_cap["stats"]["fue"] = 19
+    with pytest.raises(ValueError):
+        apply_level_up(catalog, race, cls, sub, 3, sheet_near_cap, {"asi": {"fue": 2}})
+
+
+def test_subclass_level_guard_and_max_level_cap():
+    catalog, race, cls, sub, choices = selection("human", "wizard")
+    sheet = calculate_creation(catalog, race, cls, sub, choices, {})
+    # Mago elige Tradición Arcana en nivel 2, no en nivel 3
+    lvl2 = apply_level_up(catalog, race, cls, sub, 1, sheet, {"subclass": "Evocación"})
+    assert lvl2["subclass"] == "Evocación"
+    assert any("Evocación" in f["name"] for f in lvl2["features"])
+
+    with pytest.raises(ValueError):
+        apply_level_up(catalog, race, cls, sub, 2, lvl2, {"subclass": "Abjuración"})
+    with pytest.raises(ValueError):
+        apply_level_up(catalog, race, cls, sub, 20, lvl2)
+

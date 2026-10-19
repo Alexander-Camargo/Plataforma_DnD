@@ -1,3 +1,12 @@
+/*
+Archivo: screens_test.dart
+Propósito: Pruebas de integración de widgets para las pantallas principales (campañas, mesa del DM, hoja de personaje, subida de nivel y rasgos).
+Creador: Joshua Pérez Bullen / Alexander Camargo
+Modificaciones / Actualizaciones:
+- 2026-10-12 [Joshua Pérez Bullen]: Pruebas de flujo de campañas, combate, edición de hoja y eliminación de personaje.
+- 2026-10-18 [Alexander Camargo]: Pruebas del diálogo de subida de nivel 5e (Hito 3.1) y visualización dinámica de rasgos.
+*/
+
 import 'fixtures/creation_catalog.dart';
 import 'dart:convert';
 import 'package:flutter/material.dart';
@@ -34,7 +43,7 @@ Map<String, dynamic> campaign({String dm = 'u1'}) => {
       'join_code': 'ABCD1234',
       'dm_id': dm,
     };
-Map<String, dynamic> hero({String? campaignId = 'c1'}) => {
+Map<String, dynamic> hero({String? campaignId = 'c1', int experience = 300}) => {
       'id': 'p1',
       'owner_id': 'u2',
       'campaign_id': campaignId,
@@ -45,6 +54,7 @@ Map<String, dynamic> hero({String? campaignId = 'c1'}) => {
       'status': 'alive',
       'version': 3,
       'status_note': '',
+      'experience': experience,
       'sheet': {
         'hp': 12,
         'ac': 15,
@@ -109,6 +119,7 @@ void main() {
     if (request.url.path == '/api/v1/characters/me') return reply([hero()]);
     if (request.url.path == '/api/v1/characters/') return reply([hero()]);
     if (request.url.path == '/api/v1/characters/p1') return reply(hero());
+    if (request.url.path.contains('/milestones')) return reply([]);
     return reply({'detail': 'No encontrado'}, 404);
   }
 
@@ -261,7 +272,7 @@ void main() {
       await tester.pumpAndSettle();
       await tester.tap(find.text('Entrar a la mesa de campaña'));
       await tester.pumpAndSettle();
-      expect(find.text('Estado de Personajes'), findsOneWidget);
+      expect(find.text('Control de Personajes'), findsOneWidget);
       await app.close(tester);
     }, () => MockClient(normal));
   });
@@ -367,4 +378,112 @@ void main() {
     expect(find.text('Sin imagen'), findsOneWidget);
     expect(find.byType(Image), findsNothing);
   });
+
+  testWidgets('Subir nivel abre diálogo 5e, actualiza nivel y muestra rasgos',
+      (tester) async {
+    await http.runWithClient(() async {
+      final app = _AppSession('u2');
+      await app.mount(tester, '/character/p1');
+      await tester.tap(find.text('Subir Nivel'));
+      await tester.pumpAndSettle();
+      expect(find.text('Subir a Nivel 2'), findsOneWidget);
+      expect(find.textContaining('PG Máximos: 12 → 20'), findsOneWidget);
+
+      await tester.tap(find.text('Confirmar Subida'));
+      await tester.pumpAndSettle();
+      expect(
+          find.text('¡Felicidades! Has alcanzado el nivel 2.'), findsOneWidget);
+      expect(find.text('Humano GUERRERO - Nivel 2'), findsOneWidget);
+
+      await tester.ensureVisible(find.text('Rasgos'));
+      await tester.tap(find.text('Rasgos'));
+      await tester.pumpAndSettle();
+      expect(find.textContaining('Acción súbita'), findsOneWidget);
+      await app.close(tester);
+    },
+        () => MockClient((request) async {
+              if (request.method == 'PATCH' &&
+                  request.url.path == '/api/v1/characters/p1') {
+                final body = jsonDecode(request.body);
+                expect(body['level'], 2);
+                expect(body['version'], 3);
+                final updatedSheet = Map<String, dynamic>.from(hero()['sheet']);
+                updatedSheet['hp'] = 20;
+                updatedSheet['features'] = [
+                  {
+                    'name': 'Acción súbita',
+                    'source': 'Guerrero',
+                    'level': 2,
+                    'description':
+                        'Una vez por descanso corto, realizas una acción adicional.'
+                  }
+                ];
+                return reply({
+                  ...hero(),
+                  'level': 2,
+                  'version': 4,
+                  'sheet': updatedSheet,
+                });
+              }
+              return normal(request);
+            }));
+  });
+
+  testWidgets(
+      'Control de Personajes muestra XP y DM puede consultar pestaña de Hitos',
+      (tester) async {
+    await http.runWithClient(() async {
+      final app = _AppSession('u1');
+      await app.mount(tester, '/campaign/c1');
+      expect(find.text('Control de Personajes'), findsOneWidget);
+      expect(find.textContaining('⭐ 300 / 300 XP'), findsOneWidget);
+
+      await tester.tap(find.text('Hitos'));
+      await tester.pumpAndSettle();
+      expect(find.text('No se han definido hitos para esta campaña.\nLos hitos permiten avanzar de nivel y otorgar XP.'), findsOneWidget);
+      expect(find.text('Crear Hito'), findsOneWidget);
+      await app.close(tester);
+    }, () => MockClient(normal));
+  });
+
+  testWidgets(
+      'Personaje sin campaña activa o sin XP suficiente bloquea subida de nivel',
+      (tester) async {
+    await http.runWithClient(() async {
+      // Caso 1: Sin campaña activa
+      final app1 = _AppSession('u2');
+      await app1.mount(tester, '/character/p1');
+      await tester.tap(find.text('Subir Nivel'));
+      await tester.pumpAndSettle();
+      expect(
+          find.text('Los personajes sin una campaña activa no pueden subir de nivel.'),
+          findsOneWidget);
+      await app1.close(tester);
+    },
+        () => MockClient((req) async {
+              if (req.url.path == '/api/v1/characters/p1') {
+                return reply(hero(campaignId: null, experience: 500));
+              }
+              return normal(req);
+            }));
+
+    await http.runWithClient(() async {
+      // Caso 2: Con campaña pero con XP insuficiente
+      final app2 = _AppSession('u2');
+      await app2.mount(tester, '/character/p1');
+      await tester.tap(find.text('Subir Nivel'));
+      await tester.pumpAndSettle();
+      expect(
+          find.textContaining('El personaje requiere 300 XP para subir al nivel 2'),
+          findsOneWidget);
+      await app2.close(tester);
+    },
+        () => MockClient((req) async {
+              if (req.url.path == '/api/v1/characters/p1') {
+                return reply(hero(campaignId: 'c1', experience: 50));
+              }
+              return normal(req);
+            }));
+  });
 }
+

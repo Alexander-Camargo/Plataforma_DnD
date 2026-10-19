@@ -1,3 +1,11 @@
+"""
+Archivo: test_campaigns_api.py
+Propósito: Pruebas de integración de la API de campañas (creación, unirse, notas del DM y gestión de hitos/milestones).
+Creador: Joshua Pérez Bullen / Alexander Camargo
+Modificaciones / Actualizaciones:
+- 2026-10-12 [Joshua Pérez Bullen]: Pruebas de membresía, códigos de unión, roles DM y aislamiento de notas.
+- 2026-10-18 [Alexander Camargo]: Pruebas de integración para hitos de campaña (creación, edición, eliminación y permisos).
+"""
 from tests.test_creation_rules import selection
 import uuid
 import pytest
@@ -102,4 +110,50 @@ def test_exhausted_join_codes_fail_safely(client, world, monkeypatch):
     monkeypatch.setattr(campaigns, "generate_join_code", lambda: world["campaign"]["join_code"])
     assert client.post(PREFIX + "/", headers=world["master"]["headers"],
                        json={"name": "Nueva"}).status_code == 500
+
+
+def test_milestone_crud_and_permissions(client, joined_world):
+    world = joined_world
+    c_id = world["campaign"]["id"]
+    m_headers = world["master"]["headers"]
+    p_headers = world["player"]["headers"]
+    o_headers = world["outsider"]["headers"]
+
+    # 1. Outsider no puede ver ni crear hitos
+    assert client.get(f"{PREFIX}/{c_id}/milestones", headers=o_headers).status_code == 403
+    assert client.post(f"{PREFIX}/{c_id}/milestones", headers=o_headers, json={"title": "Hito 1", "target_level": 2}).status_code == 403
+
+    # 2. Jugador puede ver pero no crear ni editar
+    assert client.get(f"{PREFIX}/{c_id}/milestones", headers=p_headers).status_code == 200
+    assert client.post(f"{PREFIX}/{c_id}/milestones", headers=p_headers, json={"title": "Hito 1", "target_level": 2}).status_code == 403
+
+    # 3. DM crea un hito
+    create_res = client.post(f"{PREFIX}/{c_id}/milestones", headers=m_headers, json={
+        "title": "Salvar al herrero",
+        "description": "Rescate en las minas",
+        "target_level": 2
+    })
+    assert create_res.status_code == 201
+    m = create_res.json()
+    assert m["title"] == "Salvar al herrero"
+    assert m["target_level"] == 2
+    assert m["xp_granted"] == 300
+    assert m["is_completed"] is False
+
+    # 4. Listar hitos
+    list_res = client.get(f"{PREFIX}/{c_id}/milestones", headers=p_headers)
+    assert len(list_res.json()) == 1
+
+    # 5. DM actualiza descripción
+    patch_res = client.patch(f"{PREFIX}/{c_id}/milestones/{m['id']}", headers=m_headers, json={
+        "description": "Nueva descripción"
+    })
+    assert patch_res.status_code == 200
+    assert patch_res.json()["description"] == "Nueva descripción"
+
+    # 6. DM elimina el hito
+    assert client.delete(f"{PREFIX}/{c_id}/milestones/{m['id']}", headers=p_headers).status_code == 403
+    assert client.delete(f"{PREFIX}/{c_id}/milestones/{m['id']}", headers=m_headers).status_code == 204
+    assert len(client.get(f"{PREFIX}/{c_id}/milestones", headers=m_headers).json()) == 0
+
 
