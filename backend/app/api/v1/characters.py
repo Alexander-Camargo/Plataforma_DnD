@@ -1,3 +1,12 @@
+"""
+Archivo: characters.py
+Propósito: Endpoints para la gestión del ciclo de vida de personajes (creación, lectura, actualización con bloqueo optimista, cambio de estado narrativo por el DM y eliminación).
+Creador: Alexander Camargo
+Modificaciones / Actualizaciones:
+- 2026-10-08 [Alexander Camargo]: Endpoints CRUD para personajes y control de estado por DM.
+- 2026-10-12 [Joshua Pérez Bullen]: Validación de creación con reglas 5e y bloqueo de cambios de nivel no unitarios.
+- 2026-10-18 [Alexander Camargo]: Inyección de la sesión db en creation_catalog para evitar aperturas de sesión redundantes.
+"""
 import uuid
 from datetime import datetime, timezone
 from typing import List

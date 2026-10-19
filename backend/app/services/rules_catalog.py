@@ -1,7 +1,11 @@
-"""Catálogo de creación a partir de las tablas del backend.
-
-Los slugs ingleses siguen siendo canónicos en los datos de reglas. El DTO
-adapta a las claves españolas ya guardadas en las hojas, sin migrarlas.
+"""
+Archivo: rules_catalog.py
+Propósito: Proveer el catálogo de creación de personajes de D&D 5e consultando las tablas de la base de datos y adaptando a las claves españolas del frontend sin migrarlas.
+Creador: Joshua Pérez Bullen
+Modificaciones / Actualizaciones:
+- 2026-10-12 [Joshua Pérez Bullen]: Implementación inicial basada en lectura de archivos JSON estáticos.
+- 2026-10-18 [Alexander Camargo]: Migración de consulta de datos desde tablas relacionales en base de datos.
+- 2026-10-18 [Alexander Camargo]: Refactorización Clean Code con funciones pequeñas (< 20 líneas), eliminación de caché mutable global y soporte para inyección de sesión de BD.
 """
 from sqlalchemy.orm import Session
 

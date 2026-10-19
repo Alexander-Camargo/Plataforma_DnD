@@ -1,3 +1,11 @@
+"""
+Archivo: seed.py
+Propósito: Script de poblamiento inicial de base de datos para sincronizar catálogos y migrar personajes antiguos.
+Creador: Alexander Camargo
+Modificaciones / Actualizaciones:
+- 2026-10-08 [Alexander Camargo]: Importación inicial de personajes desde db_personajes.json.
+- 2026-10-18 [Alexander Camargo]: Integración de seed_catalogs para poblar catálogos D&D 5e en la base de datos.
+"""
 import json
 import uuid
 from pathlib import Path

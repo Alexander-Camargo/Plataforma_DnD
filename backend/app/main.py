@@ -1,10 +1,17 @@
-import json
+"""
+Archivo: main.py
+Propósito: Punto de entrada de la aplicación FastAPI, configuración de ciclo de vida (lifespan), CORS, rutas API y servicio de archivos estáticos del frontend.
+Creador: Alexander Camargo
+Modificaciones / Actualizaciones:
+- 2026-10-08 [Alexander Camargo]: Configuración base de FastAPI, routers y CORS.
+- 2026-10-12 [Joshua Pérez Bullen]: Cabeceras anti-caché en archivos bootstrap de Flutter web.
+- 2026-10-18 [Alexander Camargo]: Inicialización automática de tablas y siembra de catálogos en el evento lifespan.
+"""
 from contextlib import asynccontextmanager
 from pathlib import Path
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse
 
 from app.core.config import get_settings
 from app.api.v1.api import api_router

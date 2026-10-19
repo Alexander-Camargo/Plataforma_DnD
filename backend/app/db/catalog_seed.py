@@ -1,4 +1,11 @@
-"""Carga inicial de catálogos y reglas D&D 5e en la base de datos."""
+"""
+Archivo: catalog_seed.py
+Propósito: Carga inicial y sincronización de los catálogos y reglas mecánicas de D&D 5e desde archivos JSON hacia la base de datos relacional.
+Creador: Alexander Camargo
+Modificaciones / Actualizaciones:
+- 2026-10-18 [Alexander Camargo]: Creación inicial para migración de datos de catálogo a PostgreSQL/SQLite.
+- 2026-10-18 [Alexander Camargo]: Refactorización Clean Code eliminando duplicación (DRY), argumentos de bandera y optimizando verificación de existencia en una sola consulta.
+"""
 import json
 from pathlib import Path
 from typing import Any

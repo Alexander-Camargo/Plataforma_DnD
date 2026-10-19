@@ -1,3 +1,11 @@
+"""
+Archivo: test_creation_api.py
+Propósito: Pruebas automatizadas de la API para el catálogo de reglas de creación y validaciones de creación de personajes.
+Creador: Joshua Pérez Bullen
+Modificaciones / Actualizaciones:
+- 2026-10-12 [Joshua Pérez Bullen]: Pruebas de endpoint /creation y validaciones mecánicas.
+- 2026-10-18 [Alexander Camargo]: Prueba de verificación de persistencia y lectura directa desde las tablas relacionales de la BD.
+"""
 import copy
 import pytest
 from tests.test_creation_rules import selection

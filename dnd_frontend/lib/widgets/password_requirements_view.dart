@@ -1,3 +1,10 @@
+/// Archivo: password_requirements_view.dart
+/// Propósito: Widget interactivo y responsivo que valida en tiempo real y muestra casillas de verificación para los requisitos de contraseña segura.
+/// Creador: Alexander Camargo
+/// Modificaciones / Actualizaciones:
+/// - 2026-10-18 [Alexander Camargo]: Creación del widget con diseño adaptable a pantallas móviles y escritorio.
+library;
+
 import 'package:flutter/material.dart';
 import '../core/theme/app_theme.dart';
 

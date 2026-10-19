@@ -1,3 +1,11 @@
+/// Archivo: login_screen.dart
+/// Propósito: Pantalla de autenticación (inicio de sesión y registro de usuarios) con soporte responsivo y validación reactiva de contraseñas.
+/// Creador: Alexander Camargo
+/// Modificaciones / Actualizaciones:
+/// - 2026-10-08 [Alexander Camargo]: Implementación inicial de login y registro.
+/// - 2026-10-18 [Alexander Camargo]: Integración de PasswordRequirementsView en el formulario de registro con validaciones interactivas.
+library;
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../core/theme/app_theme.dart';

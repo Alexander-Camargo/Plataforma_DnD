@@ -1,4 +1,11 @@
-"""BD efímera por test: nunca usa la conexión de la aplicación local."""
+"""
+Archivo: conftest.py
+Propósito: Configuración y fixtures de pytest para entorno de pruebas con SQLite efímera en memoria y actores autenticados.
+Creador: Alexander Camargo / Joshua Pérez Bullen
+Modificaciones / Actualizaciones:
+- 2026-10-12 [Joshua Pérez Bullen]: Fixtures de base de datos de pruebas, actores (master, player, outsider) y cliente de pruebas.
+- 2026-10-18 [Alexander Camargo]: Inclusión de seed_catalogs en el fixture db para disponer de catálogos en pruebas unitarias.
+"""
 import base64
 import os
 import uuid

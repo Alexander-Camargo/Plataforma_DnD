@@ -1,7 +1,11 @@
-"""Modelos ORM.
-
-Las columnas que se consultan/filtran son relacionales; la ficha del personaje
-(listas modulares: rasgos, equipo, conjuros...) vive en `sheet` como JSON/JSONB.
+"""
+Archivo: models.py
+Propósito: Definición de modelos ORM con SQLAlchemy para usuarios, campañas, personajes, crónica de eventos de estado y tablas relacionales del catálogo D&D 5e.
+Creador: Alexander Camargo
+Modificaciones / Actualizaciones:
+- 2026-10-08 [Alexander Camargo]: Modelos base de usuarios, campañas, miembros, personajes y eventos de estado.
+- 2026-10-18 [Alexander Camargo]: Incorporación de modelos de catálogo (DndRace, DndSubrace, DndClass, DndBackground, DndSkill, DndRuleConfig).
+- 2026-10-18 [Alexander Camargo]: Optimización con lazy='selectin' en subrazas para evitar N+1 queries y soporte tipado Any para JsonType en reglas.
 """
 import uuid
 from datetime import datetime, timezone
