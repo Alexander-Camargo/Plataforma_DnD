@@ -485,5 +485,32 @@ void main() {
               return normal(req);
             }));
   });
+
+  testWidgets(
+      'Hoja de personaje en pantalla móvil (360x640) adapta layout sin desbordes',
+      (tester) async {
+    tester.view.physicalSize = const Size(360, 640);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(() {
+      tester.view.resetPhysicalSize();
+      tester.view.resetDevicePixelRatio();
+    });
+
+    await http.runWithClient(() async {
+      final app = _AppSession('u2');
+      await app.mount(tester, '/character/p1');
+      await tester.pumpAndSettle();
+
+      // Verificar que el header adaptado muestra el botón Subir Nivel sin recortar
+      expect(find.text('Subir Nivel'), findsOneWidget);
+      // Verificar que las tarjetas de combate y habilidades se renderizan
+      expect(find.text('CA'), findsOneWidget);
+      expect(find.text('PG Máx'), findsOneWidget);
+      expect(find.text('Iniciativa'), findsOneWidget);
+      expect(find.text('HABILIDADES', skipOffstage: false), findsOneWidget);
+
+      await app.close(tester);
+    }, () => MockClient(normal));
+  });
 }
 

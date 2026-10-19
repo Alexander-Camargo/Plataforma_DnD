@@ -298,8 +298,8 @@ TutorialTopic? topicForLabel(String label) {
     'trasfondo' =>
       'background',
     'ca' || 'clase de armadura' => 'ac',
-    'pg' || 'pg max' || 'puntos de golpe' || 'dados de golpe' => 'hp',
-    'iniciativa' || 'velocidad' => 'initiative',
+    'pg' || 'pg max' || 'pg máx' || 'puntos de golpe' || 'dados de golpe' => 'hp',
+    'iniciativa' || 'iniciat' || 'velocidad' => 'initiative',
     'competencias' ||
     'competencias de clase' ||
     'competencias raciales' ||

@@ -7,6 +7,7 @@ Modificaciones / Actualizaciones:
 - 2026-10-12 [Joshua Pérez Bullen]: Ayuda contextual rápida y bonificadores de competencia/pericia.
 - 2026-10-18 [Alexander Camargo]: Integración del diálogo guiado de subida de nivel 5e (Hito 3.1) y renderizado dinámico de rasgos y subclase.
 - 2026-10-18 [Alexander Camargo]: Restricción de subida de nivel para personajes con campaña activa y experiencia requerida, visualización de badge de XP.
+- 2026-10-19 [Alexander Camargo]: Diseño responsive para móviles (LayoutBuilder, apilado dinámico de estadísticas y combate, botón de subir nivel adaptable).
 */
 
 import '../core/data/dnd_rules.dart';
@@ -195,29 +196,32 @@ class _CharacterScreenState extends State<CharacterScreen> {
   }
 
   // UI Builders
-  Widget _buildStatBox(String label, int score, int mod) {
+  Widget _buildStatBox(String label, int score, int mod,
+      {bool isNarrow = false}) {
     final modStr = mod >= 0 ? '+$mod' : '$mod';
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 4),
-      padding: const EdgeInsets.symmetric(vertical: 8),
+      margin: EdgeInsets.symmetric(horizontal: isNarrow ? 2 : 4),
+      padding: EdgeInsets.symmetric(
+          vertical: isNarrow ? 6 : 8, horizontal: isNarrow ? 2 : 4),
       decoration: BoxDecoration(
         color: AppColors.bgStat,
         border: Border.all(color: AppColors.borderStat, width: 1.5),
         borderRadius: BorderRadius.circular(10),
       ),
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
           Text(label,
-              style: const TextStyle(
+              style: TextStyle(
                   fontWeight: FontWeight.w600,
                   color: AppColors.muted,
-                  fontSize: 13)),
+                  fontSize: isNarrow ? 11 : 13)),
           QuickHelp(topic: topicForLabel(label)!),
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 2.0),
             child: Text(modStr,
-                style: const TextStyle(
-                    fontSize: 22,
+                style: TextStyle(
+                    fontSize: isNarrow ? 18 : 22,
                     fontWeight: FontWeight.bold,
                     color: AppColors.accent)),
           ),
@@ -227,7 +231,8 @@ class _CharacterScreenState extends State<CharacterScreen> {
                 border:
                     Border(top: BorderSide(color: AppColors.gold, width: 1))),
             child: Text('$score',
-                style: const TextStyle(fontSize: 13, color: AppColors.muted)),
+                style: TextStyle(
+                    fontSize: isNarrow ? 11 : 13, color: AppColors.muted)),
           ),
         ],
       ),
@@ -258,6 +263,8 @@ class _CharacterScreenState extends State<CharacterScreen> {
                 border: Border(bottom: BorderSide(color: AppColors.border))),
             child: Text(title,
                 textAlign: TextAlign.center,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
                 style: const TextStyle(
                     color: AppColors.accent,
                     fontWeight: FontWeight.w600,
@@ -272,7 +279,7 @@ class _CharacterScreenState extends State<CharacterScreen> {
               textAlign: TextAlign.center,
               keyboardType: TextInputType.number,
               style: const TextStyle(
-                  fontSize: 24,
+                  fontSize: 22,
                   fontWeight: FontWeight.bold,
                   color: AppColors.accent),
               decoration: const InputDecoration(
@@ -281,7 +288,7 @@ class _CharacterScreenState extends State<CharacterScreen> {
           else
             Text(value,
                 style: const TextStyle(
-                    fontSize: 26,
+                    fontSize: 24,
                     fontWeight: FontWeight.bold,
                     color: AppColors.accent)),
         ],
@@ -472,100 +479,143 @@ class _CharacterScreenState extends State<CharacterScreen> {
           child: Column(
             children: [
               // HEADER HOJA MÁS LIMPIO Y PROFESIONAL
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-                decoration: const BoxDecoration(
-                  color: AppColors.bgDark,
-                  border: Border(
-                      bottom: BorderSide(color: AppColors.gold, width: 2)),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Row(
-                      children: [
-                        CircleAvatar(
-                          radius: 28,
-                          backgroundColor: AppColors.gold,
-                          backgroundImage:
-                              c.avatarUrl != null && c.avatarUrl!.isNotEmpty
-                                  ? NetworkImage(c.avatarUrl!)
-                                  : null,
-                          child: (c.avatarUrl == null || c.avatarUrl!.isEmpty)
-                              ? const Icon(Icons.person,
-                                  size: 30, color: AppColors.bgDark)
-                              : null,
-                        ),
-                        const SizedBox(width: 16),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                                '${c.race} ${c.classSlug.toUpperCase()} - Nivel ${c.level}',
-                                style: const TextStyle(
-                                    fontSize: 16, color: AppColors.border)),
-                            const SizedBox(height: 4),
-                            Wrap(
-                              spacing: 8,
-                              runSpacing: 4,
+              LayoutBuilder(
+                builder: (context, constraints) {
+                  final isNarrow = constraints.maxWidth < 620;
+                  final avatarWidget = CircleAvatar(
+                    radius: isNarrow ? 24 : 28,
+                    backgroundColor: AppColors.gold,
+                    backgroundImage:
+                        c.avatarUrl != null && c.avatarUrl!.isNotEmpty
+                            ? NetworkImage(c.avatarUrl!)
+                            : null,
+                    child: (c.avatarUrl == null || c.avatarUrl!.isEmpty)
+                        ? Icon(Icons.person,
+                            size: isNarrow ? 26 : 30, color: AppColors.bgDark)
+                        : null,
+                  );
+
+                  final titleAndBadges = Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        '${c.race} ${c.classSlug.toUpperCase()} - Nivel ${c.level}',
+                        style: TextStyle(
+                            fontSize: isNarrow ? 14 : 16,
+                            color: AppColors.border,
+                            fontWeight: FontWeight.w600),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 4),
+                      Wrap(
+                        spacing: 6,
+                        runSpacing: 4,
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 8, vertical: 3),
+                            decoration: BoxDecoration(
+                              color: c.campaignId != null
+                                  ? AppColors.accent
+                                  : AppColors.muted,
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                  color: AppColors.gold, width: 1),
+                            ),
+                            child: Text(
+                              c.campaignId != null
+                                  ? '⚔️ En Campaña'
+                                  : '🏕️ Descansando',
+                              style: TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: isNarrow ? 11 : 12,
+                                  color: Colors.white),
+                            ),
+                          ),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 8, vertical: 3),
+                            decoration: BoxDecoration(
+                              color: AppColors.bgStat,
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                  color: AppColors.gold, width: 1),
+                            ),
+                            child: Text(
+                              c.level >= 20
+                                  ? '⭐ ${c.experience} XP'
+                                  : '⭐ ${c.experience} / ${DndRules.xpForLevel(c.level + 1)} XP',
+                              style: TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: isNarrow ? 11 : 12,
+                                  color: AppColors.gold),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  );
+
+                  final levelUpBtn = ElevatedButton.icon(
+                    onPressed: _levelUp,
+                    icon: const Icon(Icons.arrow_upward, size: 16),
+                    label: const Text('Subir Nivel'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.gold,
+                      foregroundColor: AppColors.bgDark,
+                      padding: EdgeInsets.symmetric(
+                          horizontal: isNarrow ? 12 : 16,
+                          vertical: isNarrow ? 8 : 10),
+                    ),
+                  );
+
+                  return Container(
+                    padding: EdgeInsets.symmetric(
+                        horizontal: isNarrow ? 14 : 24,
+                        vertical: isNarrow ? 12 : 16),
+                    decoration: const BoxDecoration(
+                      color: AppColors.bgDark,
+                      border: Border(
+                          bottom: BorderSide(color: AppColors.gold, width: 2)),
+                    ),
+                    child: ContentWidth(
+                      maxWidth: 1000,
+                      child: isNarrow
+                          ? Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
                               children: [
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 10, vertical: 4),
-                                  decoration: BoxDecoration(
-                                    color: c.campaignId != null
-                                        ? AppColors.accent
-                                        : AppColors.muted,
-                                    borderRadius: BorderRadius.circular(12),
-                                    border: Border.all(
-                                        color: AppColors.gold, width: 1),
-                                  ),
-                                  child: Text(
-                                    c.campaignId != null
-                                        ? '⚔️ En Campaña'
-                                        : '🏕️ Descansando',
-                                    style: const TextStyle(
-                                        fontWeight: FontWeight.w600,
-                                        fontSize: 12,
-                                        color: Colors.white),
+                                Row(
+                                  children: [
+                                    avatarWidget,
+                                    const SizedBox(width: 12),
+                                    Expanded(child: titleAndBadges),
+                                  ],
+                                ),
+                                const SizedBox(height: 10),
+                                levelUpBtn,
+                              ],
+                            )
+                          : Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Expanded(
+                                  child: Row(
+                                    children: [
+                                      avatarWidget,
+                                      const SizedBox(width: 16),
+                                      Expanded(child: titleAndBadges),
+                                    ],
                                   ),
                                 ),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 10, vertical: 4),
-                                  decoration: BoxDecoration(
-                                    color: AppColors.bgStat,
-                                    borderRadius: BorderRadius.circular(12),
-                                    border: Border.all(
-                                        color: AppColors.gold, width: 1),
-                                  ),
-                                  child: Text(
-                                    c.level >= 20
-                                        ? '⭐ ${c.experience} XP'
-                                        : '⭐ ${c.experience} / ${DndRules.xpForLevel(c.level + 1)} XP',
-                                    style: const TextStyle(
-                                        fontWeight: FontWeight.w600,
-                                        fontSize: 12,
-                                        color: AppColors.gold),
-                                  ),
-                                ),
+                                const SizedBox(width: 16),
+                                levelUpBtn,
                               ],
                             ),
-                          ],
-                        ),
-                      ],
                     ),
-                    ElevatedButton.icon(
-                      onPressed: _levelUp,
-                      icon: const Icon(Icons.arrow_upward, size: 16),
-                      label: const Text('Subir Nivel'),
-                      style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.gold,
-                          foregroundColor: AppColors.bgDark),
-                    ),
-                  ],
-                ),
+                  );
+                },
               ),
 
               // TAB CONTENT
@@ -573,277 +623,366 @@ class _CharacterScreenState extends State<CharacterScreen> {
                 child: TabBarView(
                   children: [
                     // TAB 1: Visión General
-                    SingleChildScrollView(
-                      padding: const EdgeInsets.all(20),
-                      child: Column(
-                        children: [
-                          Row(
-                            children: [
-                              Expanded(
-                                  child: _buildStatBox('FUE',
-                                      stats['fue'] ?? 10, mods['fue'] ?? 0)),
-                              Expanded(
-                                  child: _buildStatBox('DES',
-                                      stats['des'] ?? 10, mods['des'] ?? 0)),
-                              Expanded(
-                                  child: _buildStatBox('CON',
-                                      stats['con'] ?? 10, mods['con'] ?? 0)),
-                              Expanded(
-                                  child: _buildStatBox('INT',
-                                      stats['int'] ?? 10, mods['int'] ?? 0)),
-                              Expanded(
-                                  child: _buildStatBox('SAB',
-                                      stats['sab'] ?? 10, mods['sab'] ?? 0)),
-                              Expanded(
-                                  child: _buildStatBox('CAR',
-                                      stats['car'] ?? 10, mods['car'] ?? 0)),
-                            ],
-                          ),
-                          const SizedBox(height: 20),
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Expanded(
-                                child: Column(
+                    LayoutBuilder(
+                      builder: (context, constraints) {
+                        final isNarrow = constraints.maxWidth < 720;
+                        final combatCards = Row(
+                          children: [
+                            Expanded(
+                                child: _buildSmallCard(
+                                    'CA', '${c.sheet['ac'] ?? 10}',
+                                    ctrl: _caCtrl)),
+                            const SizedBox(width: 10),
+                            Expanded(
+                                child: _buildSmallCard('PG Máx',
+                                    '${c.sheet['hp'] ?? 10}',
+                                    ctrl: _hpCtrl)),
+                            const SizedBox(width: 10),
+                            Expanded(
+                                child: _buildSmallCard(
+                                    'Iniciativa',
+                                    (mods['des'] ?? 0) >= 0
+                                        ? '+${mods['des'] ?? 0}'
+                                        : '${mods['des'] ?? 0}')),
+                          ],
+                        );
+
+                        final savesCard =
+                            _buildListCard('Tiradas de Salvación', [
+                          _buildListItem(
+                              'Fuerza',
+                              DndRules.formatModifier(
+                                  c.savingThrowBonus('fue')),
+                              isProficient: saves['fue'] == true),
+                          _buildListItem(
+                              'Destreza',
+                              DndRules.formatModifier(
+                                  c.savingThrowBonus('des')),
+                              isProficient: saves['des'] == true),
+                          _buildListItem(
+                              'Constitución',
+                              DndRules.formatModifier(
+                                  c.savingThrowBonus('con')),
+                              isProficient: saves['con'] == true),
+                          _buildListItem(
+                              'Inteligencia',
+                              DndRules.formatModifier(
+                                  c.savingThrowBonus('int')),
+                              isProficient: saves['int'] == true),
+                          _buildListItem(
+                              'Sabiduría',
+                              DndRules.formatModifier(
+                                  c.savingThrowBonus('sab')),
+                              isProficient: saves['sab'] == true),
+                          _buildListItem(
+                              'Carisma',
+                              DndRules.formatModifier(
+                                  c.savingThrowBonus('car')),
+                              isProficient: saves['car'] == true),
+                        ]);
+
+                        final skillsCard = _buildListCard('Habilidades', [
+                          for (final entry in DndRules.skills.entries)
+                            _buildListItem(
+                                '${entry.value.name} (${entry.value.attribute.toUpperCase()})${c.hasExpertise(entry.key) ? " · Pericia" : ""}',
+                                DndRules.formatModifier(
+                                    c.skillBonus(entry.key)),
+                                isProficient:
+                                    c.isSkillProficient(entry.key)),
+                        ]);
+
+                        return SingleChildScrollView(
+                          padding: EdgeInsets.all(isNarrow ? 12 : 20),
+                          child: ContentWidth(
+                            maxWidth: 1000,
+                            child: Column(
+                              children: [
+                                Row(
                                   children: [
-                                    Row(
-                                      children: [
-                                        Expanded(
-                                            child: _buildSmallCard(
-                                                'CA', '${c.sheet['ac'] ?? 10}',
-                                                ctrl: _caCtrl)),
-                                        const SizedBox(width: 10),
-                                        Expanded(
-                                            child: _buildSmallCard('PG Max',
-                                                '${c.sheet['hp'] ?? 10}',
-                                                ctrl: _hpCtrl)),
-                                        const SizedBox(width: 10),
-                                        Expanded(
-                                            child: _buildSmallCard(
-                                                'Iniciat',
-                                                (mods['des'] ?? 0) >= 0
-                                                    ? '+${mods['des'] ?? 0}'
-                                                    : '${mods['des'] ?? 0}')),
-                                      ],
-                                    ),
-                                    const SizedBox(height: 16),
-                                    _buildListCard('Tiradas de Salvación', [
-                                      _buildListItem(
-                                          'Fuerza',
-                                          DndRules.formatModifier(
-                                              c.savingThrowBonus('fue')),
-                                          isProficient: saves['fue'] == true),
-                                      _buildListItem(
-                                          'Destreza',
-                                          DndRules.formatModifier(
-                                              c.savingThrowBonus('des')),
-                                          isProficient: saves['des'] == true),
-                                      _buildListItem(
-                                          'Constitución',
-                                          DndRules.formatModifier(
-                                              c.savingThrowBonus('con')),
-                                          isProficient: saves['con'] == true),
-                                      _buildListItem(
-                                          'Inteligencia',
-                                          DndRules.formatModifier(
-                                              c.savingThrowBonus('int')),
-                                          isProficient: saves['int'] == true),
-                                      _buildListItem(
-                                          'Sabiduría',
-                                          DndRules.formatModifier(
-                                              c.savingThrowBonus('sab')),
-                                          isProficient: saves['sab'] == true),
-                                      _buildListItem(
-                                          'Carisma',
-                                          DndRules.formatModifier(
-                                              c.savingThrowBonus('car')),
-                                          isProficient: saves['car'] == true),
-                                    ]),
+                                    Expanded(
+                                        child: _buildStatBox('FUE',
+                                            stats['fue'] ?? 10,
+                                            mods['fue'] ?? 0,
+                                            isNarrow: isNarrow)),
+                                    Expanded(
+                                        child: _buildStatBox('DES',
+                                            stats['des'] ?? 10,
+                                            mods['des'] ?? 0,
+                                            isNarrow: isNarrow)),
+                                    Expanded(
+                                        child: _buildStatBox('CON',
+                                            stats['con'] ?? 10,
+                                            mods['con'] ?? 0,
+                                            isNarrow: isNarrow)),
+                                    Expanded(
+                                        child: _buildStatBox('INT',
+                                            stats['int'] ?? 10,
+                                            mods['int'] ?? 0,
+                                            isNarrow: isNarrow)),
+                                    Expanded(
+                                        child: _buildStatBox('SAB',
+                                            stats['sab'] ?? 10,
+                                            mods['sab'] ?? 0,
+                                            isNarrow: isNarrow)),
+                                    Expanded(
+                                        child: _buildStatBox('CAR',
+                                            stats['car'] ?? 10,
+                                            mods['car'] ?? 0,
+                                            isNarrow: isNarrow)),
                                   ],
                                 ),
-                              ),
-                              const SizedBox(width: 20),
-                              Expanded(
-                                child: _buildListCard('Habilidades', [
-                                  for (final entry in DndRules.skills.entries)
-                                    _buildListItem(
-                                        '${entry.value.name} (${entry.value.attribute.toUpperCase()})${c.hasExpertise(entry.key) ? " · Pericia" : ""}',
-                                        DndRules.formatModifier(
-                                            c.skillBonus(entry.key)),
-                                        isProficient:
-                                            c.isSkillProficient(entry.key)),
-                                ]),
-                              ),
-                            ],
-                          )
-                        ],
-                      ),
+                                const SizedBox(height: 16),
+                                if (isNarrow) ...[
+                                  combatCards,
+                                  const SizedBox(height: 16),
+                                  savesCard,
+                                  skillsCard,
+                                ] else
+                                  Row(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Expanded(
+                                        child: Column(
+                                          children: [
+                                            combatCards,
+                                            const SizedBox(height: 16),
+                                            savesCard,
+                                          ],
+                                        ),
+                                      ),
+                                      const SizedBox(width: 20),
+                                      Expanded(child: skillsCard),
+                                    ],
+                                  ),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
                     ),
 
                     // TAB 2: Información General
-                    SingleChildScrollView(
-                      padding: const EdgeInsets.all(20),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Expanded(
-                            child: _buildListCard('Datos del Personaje', [
-                              ListTile(
-                                  title: const Text('Alineamiento',
-                                      style: TextStyle(
-                                          color: AppColors.accent,
-                                          fontWeight: FontWeight.bold)),
-                                  subtitle: Text(bg['alignment'] ?? '-')),
-                              ListTile(
-                                  title: const Text('Velocidad (ft)',
-                                      style: TextStyle(
-                                          color: AppColors.accent,
-                                          fontWeight: FontWeight.bold)),
-                                  subtitle: _buildEditableText(
-                                      '${c.sheet['speed'] ?? 30}', _speedCtrl)),
-                            ]),
-                          ),
-                          const SizedBox(width: 20),
-                          Expanded(
-                            child: _buildListCard('Apariencia', [
-                              Center(
-                                child: Container(
-                                  width: 200,
-                                  height: 200,
-                                  decoration: BoxDecoration(
-                                    border: Border.all(
-                                        color: AppColors.gold, width: 4),
-                                    borderRadius: BorderRadius.circular(8),
-                                    color: AppColors.bgStat,
-                                  ),
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(4),
-                                    child: NetworkAvatar(
-                                      url: c.avatarUrl,
-                                      width: 192,
-                                      height: 192,
-                                      placeholder: const Icon(Icons.person,
-                                          size: 100, color: Colors.grey),
-                                    ),
-                                  ),
+                    LayoutBuilder(
+                      builder: (context, constraints) {
+                        final isNarrow = constraints.maxWidth < 720;
+                        final infoCard = _buildListCard('Datos del Personaje', [
+                          ListTile(
+                              title: const Text('Alineamiento',
+                                  style: TextStyle(
+                                      color: AppColors.accent,
+                                      fontWeight: FontWeight.bold)),
+                              subtitle: Text(bg['alignment'] ?? '-')),
+                          ListTile(
+                              title: const Text('Velocidad (ft)',
+                                  style: TextStyle(
+                                      color: AppColors.accent,
+                                      fontWeight: FontWeight.bold)),
+                              subtitle: _buildEditableText(
+                                  '${c.sheet['speed'] ?? 30}', _speedCtrl)),
+                        ]);
+
+                        final appearanceCard = _buildListCard('Apariencia', [
+                          Center(
+                            child: Container(
+                              width: 200,
+                              height: 200,
+                              decoration: BoxDecoration(
+                                border: Border.all(
+                                    color: AppColors.gold, width: 4),
+                                borderRadius: BorderRadius.circular(8),
+                                color: AppColors.bgStat,
+                              ),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(4),
+                                child: NetworkAvatar(
+                                  url: c.avatarUrl,
+                                  width: 192,
+                                  height: 192,
+                                  placeholder: const Icon(Icons.person,
+                                      size: 100, color: Colors.grey),
                                 ),
                               ),
-                              if (_isEditing)
-                                Padding(
-                                  padding: const EdgeInsets.only(top: 12),
-                                  child: TextField(
-                                    controller: _avatarCtrl,
-                                    decoration: const InputDecoration(
-                                      labelText: 'URL de imagen (avatar)',
-                                      hintText: 'https://...',
-                                      isDense: true,
-                                    ),
-                                  ),
-                                ),
-                            ]),
+                            ),
                           ),
-                        ],
-                      ),
+                          if (_isEditing)
+                            Padding(
+                              padding: const EdgeInsets.only(top: 12),
+                              child: TextField(
+                                controller: _avatarCtrl,
+                                decoration: const InputDecoration(
+                                  labelText: 'URL de imagen (avatar)',
+                                  hintText: 'https://...',
+                                  isDense: true,
+                                ),
+                              ),
+                            ),
+                        ]);
+
+                        return SingleChildScrollView(
+                          padding: EdgeInsets.all(isNarrow ? 12 : 20),
+                          child: ContentWidth(
+                            maxWidth: 1000,
+                            child: isNarrow
+                                ? Column(
+                                    children: [infoCard, appearanceCard],
+                                  )
+                                : Row(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Expanded(child: infoCard),
+                                      const SizedBox(width: 20),
+                                      Expanded(child: appearanceCard),
+                                    ],
+                                  ),
+                          ),
+                        );
+                      },
                     ),
 
                     // TAB 3: Trasfondo
-                    SingleChildScrollView(
-                      padding: const EdgeInsets.all(20),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Expanded(
-                            child: Column(
-                              children: [
-                                _buildListCard('Historia', [
-                                  _buildEditableText(
-                                      bg['history'] ?? '', _historyCtrl,
-                                      maxLines: 5)
-                                ]),
-                                _buildListCard('Descripción Física', [
-                                  _buildEditableText(
-                                      bg['physical'] ?? '', _physicalCtrl,
-                                      maxLines: 3)
-                                ]),
-                              ],
-                            ),
+                    LayoutBuilder(
+                      builder: (context, constraints) {
+                        final isNarrow = constraints.maxWidth < 720;
+                        final col1 = [
+                          _buildListCard('Historia', [
+                            _buildEditableText(
+                                bg['history'] ?? '', _historyCtrl,
+                                maxLines: 5)
+                          ]),
+                          _buildListCard('Descripción Física', [
+                            _buildEditableText(
+                                bg['physical'] ?? '', _physicalCtrl,
+                                maxLines: 3)
+                          ]),
+                        ];
+
+                        final col2 = [
+                          _buildListCard('Ideales', [
+                            _buildEditableText(
+                                bg['ideals'] ?? '', _idealsCtrl,
+                                maxLines: 2)
+                          ]),
+                          _buildListCard('Vínculos', [
+                            _buildEditableText(
+                                bg['bonds'] ?? '', _bondsCtrl,
+                                maxLines: 2)
+                          ]),
+                          _buildListCard('Defectos', [
+                            _buildEditableText(
+                                bg['flaws'] ?? '', _flawsCtrl,
+                                maxLines: 2)
+                          ]),
+                        ];
+
+                        return SingleChildScrollView(
+                          padding: EdgeInsets.all(isNarrow ? 12 : 20),
+                          child: ContentWidth(
+                            maxWidth: 1000,
+                            child: isNarrow
+                                ? Column(children: [...col1, ...col2])
+                                : Row(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Expanded(child: Column(children: col1)),
+                                      const SizedBox(width: 20),
+                                      Expanded(child: Column(children: col2)),
+                                    ],
+                                  ),
                           ),
-                          const SizedBox(width: 20),
-                          Expanded(
-                            child: Column(
-                              children: [
-                                _buildListCard('Ideales', [
-                                  _buildEditableText(
-                                      bg['ideals'] ?? '', _idealsCtrl,
-                                      maxLines: 2)
-                                ]),
-                                _buildListCard('Vínculos', [
-                                  _buildEditableText(
-                                      bg['bonds'] ?? '', _bondsCtrl,
-                                      maxLines: 2)
-                                ]),
-                                _buildListCard('Defectos', [
-                                  _buildEditableText(
-                                      bg['flaws'] ?? '', _flawsCtrl,
-                                      maxLines: 2)
-                                ]),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
+                        );
+                      },
                     ),
 
                     // TAB 4: Rasgos
-                    SingleChildScrollView(
-                      padding: const EdgeInsets.all(20),
-                      child: _buildListCard(
-                        'Rasgos de Raza y Clase',
-                        _buildFeaturesList(c),
-                      ),
+                    LayoutBuilder(
+                      builder: (context, constraints) {
+                        final isNarrow = constraints.maxWidth < 720;
+                        return SingleChildScrollView(
+                          padding: EdgeInsets.all(isNarrow ? 12 : 20),
+                          child: ContentWidth(
+                            maxWidth: 1000,
+                            child: _buildListCard(
+                              'Rasgos de Raza y Clase',
+                              _buildFeaturesList(c),
+                            ),
+                          ),
+                        );
+                      },
                     ),
 
                     // TAB 5: Equipo
-                    SingleChildScrollView(
-                        padding: const EdgeInsets.all(20),
-                        child: _buildListCard(
-                            'Equipamiento',
-                            eq.isEmpty
-                                ? [
-                                    const Text('Mochila vacía.',
-                                        style: TextStyle(color: Colors.grey))
-                                  ]
-                                : eq
-                                    .map((item) => Text('• $item',
-                                        style: const TextStyle(height: 1.5)))
-                                    .toList())),
+                    LayoutBuilder(
+                      builder: (context, constraints) {
+                        final isNarrow = constraints.maxWidth < 720;
+                        return SingleChildScrollView(
+                          padding: EdgeInsets.all(isNarrow ? 12 : 20),
+                          child: ContentWidth(
+                            maxWidth: 1000,
+                            child: _buildListCard(
+                                'Equipamiento',
+                                eq.isEmpty
+                                    ? [
+                                        const Text('Mochila vacía.',
+                                            style:
+                                                TextStyle(color: Colors.grey))
+                                      ]
+                                    : eq
+                                        .map((item) => Text('• $item',
+                                            style: const TextStyle(
+                                                height: 1.5)))
+                                        .toList()),
+                          ),
+                        );
+                      },
+                    ),
 
                     // TAB 6: Acciones
-                    SingleChildScrollView(
-                        padding: const EdgeInsets.all(20),
-                        child: _buildListCard('Acciones en Combate', [
-                          const Text(
-                              'Lista rápida de lo que puedes hacer en tu turno:',
-                              style: TextStyle(
-                                  color: Colors.grey,
-                                  fontStyle: FontStyle.italic)),
-                          const SizedBox(height: 10),
-                          const Text(
-                              '• Acción Común (Atacar, Lanzar Conjuro, Correr, Esquivar, Esconderse, Ayudar)',
-                              style: TextStyle(height: 1.5)),
-                          const SizedBox(height: 10),
-                          const Text(
-                              '• Acción Adicional (Depende de clase/arma)',
-                              style: TextStyle(height: 1.5)),
-                        ])),
+                    LayoutBuilder(
+                      builder: (context, constraints) {
+                        final isNarrow = constraints.maxWidth < 720;
+                        return SingleChildScrollView(
+                          padding: EdgeInsets.all(isNarrow ? 12 : 20),
+                          child: ContentWidth(
+                            maxWidth: 1000,
+                            child: _buildListCard('Acciones en Combate', [
+                              const Text(
+                                  'Lista rápida de lo que puedes hacer en tu turno:',
+                                  style: TextStyle(
+                                      color: Colors.grey,
+                                      fontStyle: FontStyle.italic)),
+                              const SizedBox(height: 10),
+                              const Text(
+                                  '• Acción Común (Atacar, Lanzar Conjuro, Correr, Esquivar, Esconderse, Ayudar)',
+                                  style: TextStyle(height: 1.5)),
+                              const SizedBox(height: 10),
+                              const Text(
+                                  '• Acción Adicional (Depende de clase/arma)',
+                                  style: TextStyle(height: 1.5)),
+                            ]),
+                          ),
+                        );
+                      },
+                    ),
 
                     // TAB 7: Conjuros
-                    SingleChildScrollView(
-                        padding: const EdgeInsets.all(20),
-                        child: _buildListCard('Conjuros y Magia', [
-                          const Text('No conoces ningún conjuro.',
-                              style: TextStyle(color: Colors.grey))
-                        ])),
+                    LayoutBuilder(
+                      builder: (context, constraints) {
+                        final isNarrow = constraints.maxWidth < 720;
+                        return SingleChildScrollView(
+                          padding: EdgeInsets.all(isNarrow ? 12 : 20),
+                          child: ContentWidth(
+                            maxWidth: 1000,
+                            child: _buildListCard('Conjuros y Magia', [
+                              const Text('No conoces ningún conjuro.',
+                                  style: TextStyle(color: Colors.grey))
+                            ]),
+                          ),
+                        );
+                      },
+                    ),
                   ],
                 ),
               ),

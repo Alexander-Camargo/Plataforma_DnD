@@ -107,8 +107,8 @@ class _LevelUpDialogState extends State<LevelUpDialog> {
         style: const TextStyle(
             fontWeight: FontWeight.bold, color: AppColors.accent),
       ),
-      content: SizedBox(
-        width: 460,
+      content: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 460),
         child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
