@@ -205,4 +205,4 @@ Anteriormente, los catálogos y reglas de creación estaban codificados como arc
 
 El módulo [`backend/app/db/catalog_seed.py`](file:///c:/1-%20PROYECTOS/Hoja%20para%20DnD/Plataforma_DnD/backend/app/db/catalog_seed.py) se ejecuta de forma transparente:
 * Al arrancar el servidor (`lifespan` en FastAPI), se crean las tablas y se pueblan automáticamente si la base de datos está vacía.
-* Las consultas de creación y consulta de catálogo (`/api/v1/rules/creation`, `/api/v1/rules/races`, `/api/v1/rules/classes`, `/api/v1/rules/backgrounds`, `/api/v1/rules/skills`) leen directamente de las tablas de la base de datos.
+* El catálogo de creación (`/api/v1/rules/creation`) y la validación de personajes leen directamente desde las tablas relacionales de la base de datos.

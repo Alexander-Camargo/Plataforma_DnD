@@ -5,6 +5,7 @@ Las columnas que se consultan/filtran son relacionales; la ficha del personaje
 """
 import uuid
 from datetime import datetime, timezone
+from typing import Any
 
 from sqlalchemy import JSON, DateTime, ForeignKey, Integer, String, Text, Uuid
 from sqlalchemy.dialects.postgresql import JSONB
@@ -137,7 +138,7 @@ class DndRace(Base):
     description: Mapped[str] = mapped_column(Text, default="")
 
     subraces: Mapped[list["DndSubrace"]] = relationship(
-        back_populates="race", cascade="all, delete-orphan"
+        back_populates="race", cascade="all, delete-orphan", lazy="selectin"
     )
 
 
@@ -204,4 +205,4 @@ class DndRuleConfig(Base):
     __tablename__ = "dnd_rule_configs"
 
     key: Mapped[str] = mapped_column(String(80), primary_key=True)
-    data: Mapped[dict] = mapped_column(JsonType, default=dict)
+    data: Mapped[Any] = mapped_column(JsonType)

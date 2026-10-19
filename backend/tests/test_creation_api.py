@@ -19,23 +19,24 @@ def test_catalog_requires_authentication_and_exposes_choices(client, actors):
     assert elf['bonus_count'] == 2 and 'car' not in elf['bonus_options']
 
 
-def test_individual_catalog_endpoints(client, actors):
-    headers = actors['player']['headers']
-    races_res = client.get('/api/v1/rules/races', headers=headers)
-    assert races_res.status_code == 200
-    assert len(races_res.json()) >= 9
+def test_catalog_tables_are_seeded_and_queried_from_db(client, actors, db):
+    from app.db.models import DndBackground, DndClass, DndRace, DndRuleConfig, DndSkill, DndSubrace
 
-    classes_res = client.get('/api/v1/rules/classes', headers=headers)
-    assert classes_res.status_code == 200
-    assert len(classes_res.json()) >= 12
+    assert db.query(DndRace).count() == 9
+    assert db.query(DndSubrace).count() == 8
+    assert db.query(DndClass).count() == 12
+    assert db.query(DndBackground).count() == 13
+    assert db.query(DndSkill).count() == 18
+    assert db.query(DndRuleConfig).count() == 11
 
-    bg_res = client.get('/api/v1/rules/backgrounds', headers=headers)
-    assert bg_res.status_code == 200
-    assert len(bg_res.json()) >= 13
+    human = db.get(DndRace, 'human')
+    human.speed = 35
+    db.commit()
 
-    skills_res = client.get('/api/v1/rules/skills', headers=headers)
-    assert skills_res.status_code == 200
-    assert len(skills_res.json()) == 18
+    response = client.get('/api/v1/rules/creation', headers=actors['player']['headers'])
+    assert response.status_code == 200
+    races = {r['id']: r for r in response.json()['races']}
+    assert races['human']['speed'] == 35
 
 
 def test_server_replaces_forged_calculations(client, actors):

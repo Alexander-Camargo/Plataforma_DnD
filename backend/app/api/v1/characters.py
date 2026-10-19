@@ -53,7 +53,7 @@ def create_character(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
-    catalog = creation_catalog()
+    catalog = creation_catalog(db)
     try:
         race = find_option(catalog["races"], char_in.race, "Raza")
         cls = find_option(catalog["classes"], char_in.class_slug, "Clase")
@@ -156,7 +156,7 @@ def update_character(
         char.campaign_id = None
 
     try:
-        char.sheet = refresh_derived_checks(char.sheet, char.level, creation_catalog())
+        char.sheet = refresh_derived_checks(char.sheet, char.level, creation_catalog(db))
     except ValueError as error:
         raise HTTPException(status_code=400, detail=str(error)) from error
     char.version += 1
@@ -195,7 +195,7 @@ def update_character_status(
     char.status = status_in.status
     char.status_note = status_in.status_note or ""
     try:
-        char.sheet = refresh_derived_checks(char.sheet, char.level, creation_catalog())
+        char.sheet = refresh_derived_checks(char.sheet, char.level, creation_catalog(db))
     except ValueError as error:
         raise HTTPException(status_code=400, detail=str(error)) from error
     char.version += 1
