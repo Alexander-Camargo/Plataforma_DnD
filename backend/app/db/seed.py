@@ -4,11 +4,16 @@ from pathlib import Path
 
 from app.db.session import SessionLocal
 from app.db.models import Character
+from app.db.catalog_seed import seed_catalogs
 
 def seed_db():
     db = SessionLocal()
+    print("Sincronizando catálogos de D&D 5e con la base de datos...")
+    seed_catalogs(db)
+    print("Catálogos sincronizados.")
+
     if db.query(Character).count() > 0:
-        print("La base de datos ya tiene personajes. Saltando el seeder.")
+        print("La base de datos ya tiene personajes. Saltando el seeder de personajes.")
         db.close()
         return
 

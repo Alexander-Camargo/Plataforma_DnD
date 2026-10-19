@@ -8,7 +8,8 @@ from fastapi.responses import FileResponse
 
 from app.core.config import get_settings
 from app.api.v1.api import api_router
-from app.db.session import engine, Base
+from app.db.session import engine, Base, SessionLocal
+from app.db.catalog_seed import seed_catalogs
 import app.db.models  # Forzar carga de modelos
 
 settings = get_settings()
@@ -17,6 +18,8 @@ settings = get_settings()
 async def lifespan(app: FastAPI):
     # Setup inicial (crear tablas si no existen ya que no tenemos migraciones iniciales aún)
     Base.metadata.create_all(bind=engine)
+    with SessionLocal() as session:
+        seed_catalogs(session)
     yield
     # Limpieza
 

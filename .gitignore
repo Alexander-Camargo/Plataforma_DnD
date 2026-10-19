@@ -1,5 +1,6 @@
 # Backend / Python
 venv/
+.venv/
 env/
 __pycache__/
 *.pyc
@@ -25,3 +26,5 @@ Thumbs.db
 htmlcov/
 coverage/
 *.lcov
+docs/audits/
+scripts/release_agents/

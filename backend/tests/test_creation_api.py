@@ -19,6 +19,25 @@ def test_catalog_requires_authentication_and_exposes_choices(client, actors):
     assert elf['bonus_count'] == 2 and 'car' not in elf['bonus_options']
 
 
+def test_individual_catalog_endpoints(client, actors):
+    headers = actors['player']['headers']
+    races_res = client.get('/api/v1/rules/races', headers=headers)
+    assert races_res.status_code == 200
+    assert len(races_res.json()) >= 9
+
+    classes_res = client.get('/api/v1/rules/classes', headers=headers)
+    assert classes_res.status_code == 200
+    assert len(classes_res.json()) >= 12
+
+    bg_res = client.get('/api/v1/rules/backgrounds', headers=headers)
+    assert bg_res.status_code == 200
+    assert len(bg_res.json()) >= 13
+
+    skills_res = client.get('/api/v1/rules/skills', headers=headers)
+    assert skills_res.status_code == 200
+    assert len(skills_res.json()) == 18
+
+
 def test_server_replaces_forged_calculations(client, actors):
     body = payload()
     body['sheet'] = {'stats': {'fue': 99}, 'hp': 999, 'skill_bonuses': {'atletismo': 99},

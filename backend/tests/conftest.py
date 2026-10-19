@@ -23,6 +23,9 @@ from app.db.models import User
 from app.core.security import hash_password, encrypt, blind_index, create_token
 
 
+from app.db.catalog_seed import seed_catalogs
+
+
 @pytest.fixture
 def db():
     engine = create_engine("sqlite://", connect_args={"check_same_thread": False}, poolclass=StaticPool)
@@ -33,6 +36,7 @@ def db():
 
     Base.metadata.create_all(engine)
     with Session(engine, expire_on_commit=False) as session:
+        seed_catalogs(session)
         yield session
     engine.dispose()
 

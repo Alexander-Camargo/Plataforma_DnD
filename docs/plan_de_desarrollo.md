@@ -18,6 +18,8 @@ El desarrollo de la **Plataforma DnD** se divide en fases para asegurar entregas
 *   [x] Integración de generación de archivos PDF para la hoja de personaje (compatible con la web nativa).
 
 ## ⏳ Fase 3: Mecánicas D&D 5e Avanzadas (En Progreso)
+*   [x] **Migración de Catálogos a BD:** Modelado relacional y persistencia de razas, subrazas, clases, trasfondos, habilidades y reglas mecánicas en la base de datos (eliminando dependencia de JSON estáticos).
+*   [x] **Flujo de Creación Oficial 5e:** Compra de puntos (27 pts), bonificadores raciales dinámicos y validación de competencias en backend y frontend.
 *   [ ] **Subida de Nivel:** Interfaz para notificar cuando hay un nivel disponible y aplicar cambios.
 *   [ ] **Mejora de Puntuación de Características (ASI):** Lógica para aumentar atributos o escoger dotes cada ciertos niveles.
 *   [ ] Selección y asignación de Conjuros (Spellcasting) dependiendo de la clase.
