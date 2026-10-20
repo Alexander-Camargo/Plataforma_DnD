@@ -24,7 +24,7 @@ jobs:
       - name: Build Flutter Web Frontend
         run: |
           cd /home/ultimasl/1A-PROYECTOS/Plataforma_DnD/dnd_frontend
-          flutter build web --release
+          flutter build web --release --no-web-resources-cdn
 
       - name: Rebuild & Restart Docker Containers
         run: |

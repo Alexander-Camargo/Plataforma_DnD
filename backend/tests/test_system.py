@@ -39,3 +39,19 @@ def test_static_bootstrap_is_not_cached_but_other_assets_keep_normal_headers(tmp
             assert response.headers["pragma"] == "no-cache"
         assert "cache-control" not in static_client.get("/asset.txt").headers
 
+
+def test_static_spa_fallback_routes(tmp_path):
+    from fastapi import FastAPI
+    (tmp_path / "index.html").write_text("<html>SPA Index</html>")
+    (tmp_path / "asset.txt").write_text("asset")
+    test_app = FastAPI()
+    test_app.mount("/", NoCacheStaticFiles(directory=str(tmp_path), html=True))
+    with TestClient(test_app) as static_client:
+        # Rutas de navegación SPA sin extensión deben devolver index.html con 200
+        for path in ("/login", "/my-characters", "/campaign/123"):
+            response = static_client.get(path)
+            assert response.status_code == 200
+            assert "SPA Index" in response.text
+        # Archivos que no existen con extensión deben responder 404
+        assert static_client.get("/missing.wasm").status_code == 404
+        assert static_client.get("/missing.js").status_code == 404
