@@ -1,4 +1,4 @@
-# Arquitectura de Plataforma DnD
+# Arquitectura de LA CRIPTA
 
 La plataforma está diseñada con una arquitectura moderna de cliente-servidor, separando claramente la interfaz de usuario (Frontend) de la lógica de negocio y persistencia de datos (Backend). 
 

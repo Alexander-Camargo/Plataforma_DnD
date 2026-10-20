@@ -1,6 +1,6 @@
 # Plan de Desarrollo
 
-El desarrollo de la **Plataforma DnD** se divide en fases para asegurar entregas funcionales y estables.
+El desarrollo de **LA CRIPTA** se divide en fases para asegurar entregas funcionales y estables.
 
 ## ✅ Fase 1: Fundaciones y Estructura Base (Completada)
 *   [x] Configuración de Docker y contenedores (PostgreSQL + FastAPI).

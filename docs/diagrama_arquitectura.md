@@ -1,4 +1,4 @@
-# Diagrama de Arquitectura de la Plataforma DnD
+# Diagrama de Arquitectura de LA CRIPTA
 
 A continuación se ilustra la arquitectura de alto nivel del sistema, mostrando cómo el usuario interactúa con la plataforma y cómo se comunican los componentes internos.
 

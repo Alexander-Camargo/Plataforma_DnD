@@ -12,7 +12,7 @@ concurrency:
 
 jobs:
   deploy:
-    name: Build & Deploy Plataforma DnD
+    name: Build & Deploy LA CRIPTA
     runs-on: [self-hosted, raspi]
     steps:
       - name: Update local repository to latest release

@@ -41,7 +41,7 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(
     title="LA CRIPTA API",
-    description="API para LA CRIPTA - Plataforma y gestor de personajes D&D 5e.",
+    description="API para LA CRIPTA - Gestor de personajes y campañas D&D 5e.",
     version="1.0.0",
     lifespan=lifespan,
     openapi_url="/api/v1/openapi.json",

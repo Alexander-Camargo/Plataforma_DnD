@@ -1,4 +1,4 @@
-# Plataforma D&D
+# LA CRIPTA
 
 Aplicación web para crear y consultar personajes de D&D 5e, organizar campañas y gestionar una mesa como Dungeon Master. La guía de juego utiliza las reglas de 2014 y el SRD 5.1.
 

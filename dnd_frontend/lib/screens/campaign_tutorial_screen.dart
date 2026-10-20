@@ -167,7 +167,7 @@ class CampaignTutorialScreen extends StatelessWidget {
               _topicCard(topic),
             const SheetCard(title: 'Fuentes y licencia', children: [
               SelectableText(
-                  'Guía de D&D 5e (2014), basada en SRD 5.1 y en las reglas del proyecto. Referencias: Races, Classes, Using Ability Scores, Adventuring, Combat y Spellcasting. Los ejemplos numéricos son ilustrativos; los consejos de mesa y las instrucciones de la plataforma son explicaciones propias.',
+                  'Guía de D&D 5e (2014), basada en SRD 5.1 y en las reglas del proyecto. Referencias: Races, Classes, Using Ability Scores, Adventuring, Combat y Spellcasting. Los ejemplos numéricos son ilustrativos; los consejos de mesa y las instrucciones de LA CRIPTA son explicaciones propias.',
                   style: TextStyle(height: 1.5)),
               SizedBox(height: 12),
               SelectableText(
