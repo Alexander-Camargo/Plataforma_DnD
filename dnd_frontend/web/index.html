@@ -6,24 +6,11 @@
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
 
-  <!--
-    If you are serving your web app in a path other than the root, change the
-    href value below to reflect the base path you are serving from.
-
-    The path provided below has to start and end with a slash "/" in order for
-    it to work correctly.
-
-    For more details:
-    * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base
-
-    This is a placeholder for base href that will be replaced by the value of
-    the `--base-href` argument provided to `flutter build`.
-  -->
   <base href="$FLUTTER_BASE_HREF">
 
   <meta charset="UTF-8">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
-  <meta name="description" content="A new Flutter project.">
+  <meta name="description" content="Plataforma D&D 5e">
 
   <!-- iOS meta tags & icons -->
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -34,27 +21,43 @@
   <!-- Favicon -->
   <link rel="icon" type="image/png" href="favicon.png"/>
 
-  <title>dnd_frontend</title>
+  <title>Plataforma D&D</title>
   <link rel="manifest" href="manifest.json">
+  <style>
+    /* Estilos visuales inmediatos para evitar pantalla en blanco durante la carga del motor Flutter */
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #121212;
+      color: #dfba73;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+    #loading-indicator {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      width: 100vw;
+    }
+    .loading-spinner {
+      width: 44px;
+      height: 44px;
+      border: 4px solid rgba(223, 186, 115, 0.2);
+      border-top-color: #dfba73;
+      border-radius: 50%;
+      animation: spin 0.9s linear infinite;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  </style>
 </head>
 <body>
-  <script>
-    // Limpiar Service Worker y CacheStorage antiguos para que los usuarios vean siempre la versión más reciente
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.getRegistrations().then(function(registrations) {
-        for (var i = 0; i < registrations.length; i++) {
-          registrations[i].unregister();
-        }
-      });
-    }
-    if ('caches' in window) {
-      caches.keys().then(function(names) {
-        for (var name of names) {
-          caches.delete(name);
-        }
-      });
-    }
-  </script>
+  <div id="loading-indicator">
+    <div class="loading-spinner"></div>
+    <p style="margin-top: 16px; font-weight: 500; letter-spacing: 0.5px;">Cargando Plataforma D&amp;D...</p>
+  </div>
   <script src="flutter_bootstrap.js" async></script>
 </body>
 </html>

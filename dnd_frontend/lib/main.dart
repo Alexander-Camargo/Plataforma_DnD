@@ -6,11 +6,11 @@ import 'providers/auth_provider.dart';
 import 'providers/campaign_provider.dart';
 import 'providers/character_provider.dart';
 
-void main() async {
+void main() {
   WidgetsFlutterBinding.ensureInitialized();
 
-  final authProvider = AuthProvider();
-  await authProvider.init();
+  // Iniciar la carga de autenticación sin bloquear el renderizado inicial de Flutter
+  final authProvider = AuthProvider()..init();
 
   runApp(
     MultiProvider(
