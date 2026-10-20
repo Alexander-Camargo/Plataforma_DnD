@@ -24,10 +24,7 @@
   <title>LA CRIPTA</title>
   <link rel="manifest" href="manifest.json">
   <script>
-    // Versión de despliegue para invalidación inmediata de caché en Cloudflare y navegadores
-    window.__APP_VERSION__ = "20261019_lacripta_v2";
-
-    // Purgar CacheStorage y Service Workers viejos
+    // Purgar CacheStorage y Service Workers antiguos para garantizar contenido fresco
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.getRegistrations().then(function(registrations) {
         for (var i = 0; i < registrations.length; i++) {
@@ -42,30 +39,6 @@
         }
       });
     }
-
-    // Interceptar la inyección de main.dart.js para forzar cache-busting en Cloudflare Edge
-    (function() {
-      var origCreateElement = document.createElement.bind(document);
-      document.createElement = function(tagName, options) {
-        var el = origCreateElement(tagName, options);
-        if (tagName && tagName.toLowerCase() === 'script') {
-          var origSetAttribute = el.setAttribute.bind(el);
-          var currentSrc = '';
-          Object.defineProperty(el, 'src', {
-            configurable: true,
-            get: function() { return currentSrc; },
-            set: function(url) {
-              if (url && typeof url === 'string' && url.indexOf('main.dart.js') !== -1 && url.indexOf('?v=') === -1) {
-                url = url + (url.indexOf('?') !== -1 ? '&' : '?') + 'v=' + window.__APP_VERSION__;
-              }
-              currentSrc = url;
-              origSetAttribute('src', url);
-            }
-          });
-        }
-        return el;
-      };
-    })();
 
     // Garantizar que en todo momento el título de la pestaña del navegador sea 'LA CRIPTA'
     document.title = "LA CRIPTA";
@@ -120,6 +93,6 @@
     <div class="loading-spinner"></div>
     <p style="margin-top: 16px; font-weight: 500; letter-spacing: 0.5px;">Cargando LA CRIPTA...</p>
   </div>
-  <script src="flutter_bootstrap.js?v=20261019_lacripta_v2" async></script>
+  <script src="flutter_bootstrap.js" async></script>
 </body>
 </html>

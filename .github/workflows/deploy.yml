@@ -25,6 +25,7 @@ jobs:
         run: |
           cd /home/ultimasl/1A-PROYECTOS/Plataforma_DnD/dnd_frontend
           flutter build web --release --no-web-resources-cdn
+          python3 ../scripts/post_build_web.py
 
       - name: Rebuild & Restart Docker Containers
         run: |
