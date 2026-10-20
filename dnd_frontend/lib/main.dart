@@ -40,6 +40,7 @@ class _DndPlatformAppState extends State<DndPlatformApp> {
   Widget build(BuildContext context) {
     return MaterialApp.router(
       title: 'LA CRIPTA',
+      onGenerateTitle: (context) => 'LA CRIPTA',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light,
       routerConfig: _router,

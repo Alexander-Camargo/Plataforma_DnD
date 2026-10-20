@@ -23,6 +23,25 @@
 
   <title>LA CRIPTA</title>
   <link rel="manifest" href="manifest.json">
+  <script>
+    // Garantizar que en todo momento el título de la pestaña del navegador sea 'LA CRIPTA'
+    document.title = "LA CRIPTA";
+    if (window.MutationObserver) {
+      var _titleObserver = new MutationObserver(function() {
+        if (document.title !== "LA CRIPTA") {
+          document.title = "LA CRIPTA";
+        }
+      });
+      _titleObserver.observe(document.querySelector('title') || document.head, {
+        childList: true,
+        subtree: true,
+        characterData: true
+      });
+    }
+    window.addEventListener('focus', function() { document.title = "LA CRIPTA"; });
+    window.addEventListener('load', function() { document.title = "LA CRIPTA"; });
+    window.addEventListener('popstate', function() { document.title = "LA CRIPTA"; });
+  </script>
   <style>
     /* Estilos visuales inmediatos para evitar pantalla en blanco durante la carga del motor Flutter */
     body {
