@@ -39,6 +39,14 @@ services:
     ports:
       - "8000:8000"
 
+  tunnel:
+    image: cloudflare/cloudflared:latest
+    container_name: dnd_tunnel
+    restart: unless-stopped
+    command: tunnel --no-autoupdate run --token ${CLOUDFLARE_TUNNEL_TOKEN}
+    depends_on:
+      - backend
+
 volumes:
   pgdata:
   uploaded_images:
