@@ -9,6 +9,7 @@ Modificaciones / Actualizaciones:
 - 2026-10-19 [Alexander Camargo]: Garantizar columna experience en tabla characters durante lifespan.
 - 2026-10-19 [Alexander Camargo]: Enrutamiento SPA en FastAPI con fallback index.html y soporte CORS para IPs de red local.
 - 2026-10-19 [Alexander Camargo]: Actualización de nombre oficial del sistema a LA CRIPTA.
+- 2026-10-19 [Alexander Camargo]: Reglas anti-caché universales para scripts JS (incluyendo main.dart.js), WASM y HTML.
 """
 from contextlib import asynccontextmanager
 from pathlib import Path
@@ -68,7 +69,9 @@ class NoCacheStaticFiles(StaticFiles):
     async def get_response(self, path: str, scope):
         try:
             response = await super().get_response(path, scope)
-            if path in (".", "", "index.html", "flutter_bootstrap.js", "version.json", "manifest.json", "flutter_service_worker.js"):
+            # Aplicar cabeceras anti-caché estrictas para código cliente web (HTML, JS, WASM, JSON)
+            clean_path = path.split("?")[0].lower()
+            if clean_path in (".", "", "index.html") or clean_path.endswith((".js", ".json", ".html", ".wasm")):
                 response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate, max-age=0"
                 response.headers["Pragma"] = "no-cache"
                 response.headers["Expires"] = "0"
