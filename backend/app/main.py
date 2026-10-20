@@ -8,6 +8,7 @@ Modificaciones / Actualizaciones:
 - 2026-10-18 [Alexander Camargo]: Inicialización automática de tablas y siembra de catálogos en el evento lifespan.
 - 2026-10-19 [Alexander Camargo]: Garantizar columna experience en tabla characters durante lifespan.
 - 2026-10-19 [Alexander Camargo]: Enrutamiento SPA en FastAPI con fallback index.html y soporte CORS para IPs de red local.
+- 2026-10-19 [Alexander Camargo]: Actualización de nombre oficial del sistema a LA CRIPTA.
 """
 from contextlib import asynccontextmanager
 from pathlib import Path
@@ -39,8 +40,8 @@ async def lifespan(app: FastAPI):
     # Limpieza
 
 app = FastAPI(
-    title="Plataforma D&D API",
-    description="API para generador y gestor de personajes D&D 5e.",
+    title="LA CRIPTA API",
+    description="API para LA CRIPTA - Plataforma y gestor de personajes D&D 5e.",
     version="1.0.0",
     lifespan=lifespan,
     openapi_url="/api/v1/openapi.json",

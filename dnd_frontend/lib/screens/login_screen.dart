@@ -4,6 +4,7 @@
 /// Modificaciones / Actualizaciones:
 /// - 2026-10-08 [Alexander Camargo]: Implementación inicial de login y registro.
 /// - 2026-10-18 [Alexander Camargo]: Integración de PasswordRequirementsView en el formulario de registro con validaciones interactivas.
+/// - 2026-10-19 [Alexander Camargo]: Actualización de marca a LA CRIPTA.
 library;
 
 import 'package:flutter/material.dart';
@@ -87,7 +88,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     const Icon(Icons.auto_stories, size: 48, color: AppColors.accent),
                     const SizedBox(height: 8),
                     const Text(
-                      'PLATAFORMA D&D',
+                      'LA CRIPTA',
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 26,

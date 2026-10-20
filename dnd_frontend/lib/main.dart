@@ -39,7 +39,7 @@ class _DndPlatformAppState extends State<DndPlatformApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp.router(
-      title: 'Plataforma D&D',
+      title: 'LA CRIPTA',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light,
       routerConfig: _router,
